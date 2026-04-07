@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 
 import { deepMergeGraduateDetails } from "@/lib/graduate-program-detail-deep-merge";
+import { isLocallyStoredUploadSrc, resolveUploadImageSrc } from "@/lib/upload-public-url";
 import { carouselImageOverlayStyle } from "@/lib/graduate-program-gradient";
 import lawHeroImage from "@/public/assets/landing/department/law.webp";
 import { graduateStudiesDeatil } from "@/staticData/GraduateStudies";
@@ -173,7 +174,9 @@ export default function DetailPageComp({
     ? programInfo.affiliationAr
     : programInfo.affiliationEn;
 
-  const resolvedHeroSrc = heroImageSrc ?? lawHeroImage;
+  const resolvedHeroSrc = heroImageSrc
+    ? resolveUploadImageSrc(heroImageSrc) || heroImageSrc
+    : lawHeroImage;
   const resolvedHeroOverlay = useMemo(
     () =>
       heroOverlayStyle ??
@@ -595,7 +598,7 @@ export default function DetailPageComp({
                     sizes="100vw"
           unoptimized={
             typeof resolvedHeroSrc === "string" &&
-            (resolvedHeroSrc.startsWith("/uploads/") ||
+            (isLocallyStoredUploadSrc(resolvedHeroSrc) ||
               resolvedHeroSrc.startsWith("data:"))
           }
                 />

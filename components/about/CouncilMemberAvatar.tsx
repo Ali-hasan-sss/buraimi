@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
 
 type Props = {
     image?: string;
@@ -13,9 +14,9 @@ type Props = {
     iconClassName: string;
 };
 
-/** Photo from API (`/uploads/...`) or gradient + icon fallback — matches about-page council cards. */
+/** Photo from API (`/api/uploads/...` or legacy `/uploads/...`) or gradient + icon fallback. */
 export function CouncilMemberAvatar({ image, name, fallback: Icon, className, iconClassName }: Props) {
-    const src = image?.trim();
+    const src = resolveUploadImageSrc(image ?? "");
     return (
         <div className={cn("relative flex items-center justify-center overflow-hidden", className)}>
             {src ? (

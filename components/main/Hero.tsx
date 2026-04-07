@@ -20,6 +20,7 @@ import { useLocale, useTranslations } from "next-intl";
 import BilingualTextEditDialog from "@/components/admin/BilingualTextEditDialog";
 import ButtonEditDialog from "@/components/admin/ButtonEditDialog";
 import LinkEditDialog from "@/components/admin/LinkEditDialog";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
 
 type HeroSlide = {
   image: string;
@@ -101,7 +102,7 @@ function AnnouncementCardBody({
       <div className="flex-shrink-0">
         <div className="group relative h-24 w-24 overflow-hidden rounded-xl">
           <Image
-            src={ann.image}
+            src={resolveUploadImageSrc(ann.image)}
             alt="announcement"
             fill
             className="object-cover"
@@ -442,7 +443,7 @@ export function Hero({
             />
           ) : (
             <Image
-              src={slide.image}
+              src={resolveUploadImageSrc(slide.image)}
               alt={slide.titleAr || slide.titleEn || t("slideAlt")}
               fill
               priority={index === 0}

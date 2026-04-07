@@ -25,5 +25,5 @@ export async function saveUploadedImage(fileEntry: FormDataEntryValue | null): P
   const arrayBuffer = await fileEntry.arrayBuffer();
   await writeFile(fullPath, Buffer.from(arrayBuffer));
 
-  return `/uploads/${fileName}`;
+  return `/api/uploads/${fileName}`;
 }

@@ -9,6 +9,7 @@ import { carouselImageOverlayStyle } from "@/lib/graduate-program-gradient";
 import { cn } from "@/lib/utils";
 import { getFallbackGraduateCarousel } from "@/lib/graduate-program-fallback";
 import type { GraduateCarouselCard } from "@/types/graduate-program";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
 
 type Props = {
   programs?: GraduateCarouselCard[];
@@ -127,7 +128,7 @@ export function GraduateStudies({ programs: programsProp }: Props) {
                 <div className="absolute inset-0">
                   <Image
                     fill
-                    src={program.image}
+                    src={resolveUploadImageSrc(program.image)}
                     alt={program.titleAr ?? program.titleEn}
                     sizes="(min-width: 1536px) 33vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 rounded-xl"

@@ -32,7 +32,8 @@ export async function POST(request: Request) {
 
         const extension = path.extname(file.name) || '.webp';
         const fileName = `${Date.now()}-${randomUUID()}${extension}`;
-        const relativePath = `/uploads/${fileName}`;
+        /** Served via GET /api/uploads/[...path] so production can read runtime files from disk. */
+        const relativePath = `/api/uploads/${fileName}`;
         const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
         const fullPath = path.join(uploadsDir, fileName);
 
@@ -44,6 +45,8 @@ export async function POST(request: Request) {
         return NextResponse.json({
             ok: true,
             relativePath,
+            /** Legacy alias for older clients / docs */
+            legacyPath: `/uploads/${fileName}`,
             url: baseUrl ? `${baseUrl}${relativePath}` : relativePath,
         });
     } catch (e) {

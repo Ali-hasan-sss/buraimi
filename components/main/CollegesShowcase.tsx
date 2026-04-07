@@ -4,6 +4,7 @@ import { useState, useRef, MouseEvent } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import type { DepartmentShowcaseCard } from '@/lib/department-public';
+import { isLocallyStoredUploadSrc, resolveUploadImageSrc } from '@/lib/upload-public-url';
 
 export function CollegesShowcase({ colleges }: { colleges: DepartmentShowcaseCard[] }) {
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -151,12 +152,12 @@ export function CollegesShowcase({ colleges }: { colleges: DepartmentShowcaseCar
                                         <div className="absolute inset-0">
                                             <Image
                                                 fill
-                                                src={college.image}
+                                                src={resolveUploadImageSrc(college.image)}
                                                 alt={title}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 rounded-xl"
                                                 draggable={false}
                                                 sizes="(min-width: 1536px) 380px, (min-width: 1024px) 350px, (min-width: 640px) 320px, 88vw"
-                                                unoptimized={college.image.startsWith("/uploads/")}
+                                                unoptimized={isLocallyStoredUploadSrc(college.image)}
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                                         </div>

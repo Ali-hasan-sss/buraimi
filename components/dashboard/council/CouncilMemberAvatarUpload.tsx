@@ -7,9 +7,10 @@ import { Loader2, Upload, User, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
 
 type Props = {
-  /** Stored relative path, e.g. `/uploads/....jpg` */
+  /** Stored path, e.g. `/api/uploads/....jpg` or legacy `/uploads/...` */
   defaultPath?: string;
   /** Form field name — use `memberImagePath` so Server Actions reliably post the value */
   inputName?: string;
@@ -85,7 +86,7 @@ export function CouncilMemberAvatarUpload({
         >
           {path ? (
             <Image
-              src={path}
+              src={resolveUploadImageSrc(path)}
               alt=""
               fill
               className="object-cover"

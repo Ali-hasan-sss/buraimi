@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
 import { BoardTrustee } from "@/models/BoardTrustees";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -68,7 +69,7 @@ export default async function Trust() {
                                         <td className="px-4 py-3">
                                             {m.image ? (
                                                 <div className="relative size-10 overflow-hidden rounded-md border">
-                                                    <Image src={m.image} alt={m.name} fill className="object-cover" sizes="40px" />
+                                                    <Image src={resolveUploadImageSrc(m.image)} alt={m.name} fill className="object-cover" sizes="40px" />
                                                 </div>
                                             ) : (
                                                 <span className="text-muted-foreground">—</span>

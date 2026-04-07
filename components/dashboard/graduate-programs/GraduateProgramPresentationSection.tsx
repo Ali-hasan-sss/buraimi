@@ -6,6 +6,7 @@ import { ImageUp, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
+import { isLocallyStoredUploadSrc, resolveUploadImageSrc } from "@/lib/upload-public-url";
 import {
   buildTailwindGradientTwoStops,
   carouselImageOverlayStyle,
@@ -118,9 +119,9 @@ export default function GraduateProgramPresentationSection({
     ? previewTitleAr || previewTitleEn || "—"
     : previewTitleEn || previewTitleAr || "—";
 
-  const imageSrc =
-    imagePath ||
-    "data:image/svg+xml," +
+  const imageSrc = imagePath
+    ? resolveUploadImageSrc(imagePath) || imagePath
+    : "data:image/svg+xml," +
       encodeURIComponent(
         `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"><rect fill="#e8eef2" width="400" height="500"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="14">Preview</text></svg>`,
       );
@@ -254,7 +255,8 @@ export default function GraduateProgramPresentationSection({
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="220px"
                 unoptimized={
-                  imagePath.startsWith("/uploads/") || imageSrc.startsWith("data:")
+                  isLocallyStoredUploadSrc(imagePath) ||
+                  imageSrc.startsWith("data:")
                 }
               />
               <div className="absolute inset-0" style={overlayStyle} />

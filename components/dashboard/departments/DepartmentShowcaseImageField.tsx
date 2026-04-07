@@ -6,6 +6,7 @@ import { ImageUp, Loader2, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { isLocallyStoredUploadSrc, resolveUploadImageSrc } from '@/lib/upload-public-url';
 
 type Props = {
     name?: string;
@@ -101,12 +102,12 @@ export default function DepartmentShowcaseImageField({ name = 'showcaseImage', d
                     {path ? (
                         <>
                             <Image
-                                src={path}
+                                src={resolveUploadImageSrc(path)}
                                 alt=""
                                 fill
                                 className="object-cover"
                                 sizes="176px"
-                                unoptimized={path.startsWith('/uploads/')}
+                                unoptimized={isLocallyStoredUploadSrc(path)}
                             />
                             <div
                                 className={cn(
