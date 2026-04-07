@@ -1,0 +1,80 @@
+import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+/** Load `.env` into `process.env` (Node does not read it by default). */
+function loadEnvFile() {
+  const root = dirname(fileURLToPath(import.meta.url));
+  const envPath = join(root, '.env');
+  if (!existsSync(envPath)) return;
+  const text = readFileSync(envPath, 'utf8');
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let val = trimmed.slice(eq + 1).trim();
+    if (
+      (val.startsWith('"') && val.endsWith('"')) ||
+      (val.startsWith("'") && val.endsWith("'"))
+    ) {
+      val = val.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = val;
+  }
+}
+
+loadEnvFile();
+
+const baseUrl = process.env.SEED_BASE_URL || 'http://localhost:3000';
+const seedKey = process.env.ADMIN_SEED_KEY;
+
+if (!seedKey) {
+  console.error('Missing ADMIN_SEED_KEY. Set it in `.env` or in the shell before running.');
+  process.exit(1);
+}
+
+const endpoints = [
+  '/api/auth/seed-admin',
+  '/api/messages/seed',
+  '/api/news/seed',
+  '/api/partnerships/seed',
+  '/api/departments/seed',
+  '/api/graduate-programs/seed',
+  '/api/contact/seed',
+  '/api/site-contact-settings/seed',
+  '/api/college-council/seed',
+  '/api/board-directors/seed',
+  '/api/board-trustees/seed',
+  '/api/advisory-council/seed',
+];
+
+async function run() {
+  for (const endpoint of endpoints) {
+    const url = `${baseUrl}${endpoint}`;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'x-seed-key': seedKey,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const text = await res.text();
+      let body;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = text;
+      }
+
+      console.log(`${res.status} ${endpoint}`, body);
+    } catch (error) {
+      console.error(`FAILED ${endpoint}`, error);
+    }
+  }
+}
+
+run();
