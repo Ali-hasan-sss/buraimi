@@ -6,54 +6,28 @@ import { useRouter } from 'next/navigation';
 export default function Page() {
     const router = useRouter();
     const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState('');
-    const [step, setStep] = useState<'request' | 'verify'>('request');
+    const [password, setPassword] = useState('');
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const requestOtp = async () => {
+    const login = async () => {
         setLoading(true);
         setStatus('');
         try {
-            const res = await fetch('/api/auth/request-otp', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ email, purpose: 'login' }),
+                body: JSON.stringify({ email, password }),
             });
 
             const data = (await res.json()) as { ok: boolean; message?: string };
             if (!res.ok || !data.ok) {
-                setStatus(data.message || 'Failed to request OTP');
+                setStatus(data.message || 'Invalid email or password');
                 return;
             }
 
-            setStep('verify');
-            setStatus('If the email is allowed as admin, OTP is generated (check dev server logs).');
-        } catch {
-            setStatus('Unexpected error');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const verifyOtp = async () => {
-        setLoading(true);
-        setStatus('');
-        try {
-            const res = await fetch('/api/auth/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ email, purpose: 'login', code: otp }),
-            });
-
-            const data = (await res.json()) as { ok: boolean; message?: string };
-            if (!res.ok || !data.ok) {
-                setStatus(data.message || 'Invalid OTP');
-                return;
-            }
-
+            setStatus('Login successful, redirecting...');
             router.push('/dashboard');
             router.refresh();
         } catch {
@@ -73,36 +47,24 @@ export default function Page() {
                     placeholder="admin@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading || step === 'verify'}
+                    disabled={loading}
                 />
-                {step === 'verify' && (
-                    <input
-                        type="text"
-                        className="w-full border rounded px-3 py-2"
-                        placeholder="OTP code"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        disabled={loading}
-                    />
-                )}
+                <input
+                    type="password"
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                />
                 {status && <p className="text-sm text-gray-600">{status}</p>}
-                {step === 'request' ? (
-                    <button
-                        onClick={requestOtp}
-                        disabled={loading || !email}
-                        className="w-full bg-[#254151] text-white rounded px-3 py-2 disabled:opacity-50"
-                    >
-                        Request OTP
-                    </button>
-                ) : (
-                    <button
-                        onClick={verifyOtp}
-                        disabled={loading || !otp}
-                        className="w-full bg-[#254151] text-white rounded px-3 py-2 disabled:opacity-50"
-                    >
-                        Verify & Login
-                    </button>
-                )}
+                <button
+                    onClick={login}
+                    disabled={loading || !email || !password}
+                    className="w-full bg-[#254151] text-white rounded px-3 py-2 disabled:opacity-50"
+                >
+                    Login
+                </button>
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import { User } from '@/models/User';
 
@@ -32,12 +33,19 @@ export async function POST(request: Request) {
     const firstName = (process.env.ADMIN_FIRST_NAME || 'Admin').trim();
     const lastName = (process.env.ADMIN_LAST_NAME || 'User').trim();
     const age = Number(process.env.ADMIN_AGE || 30);
+    const adminPassword = process.env.ADMIN_PASSWORD || '';
+    if (!adminPassword) {
+        return NextResponse.json({ ok: false, message: 'Missing ADMIN_PASSWORD' }, { status: 400 });
+    }
 
     const existing = await User.findOne({ email: adminEmail }).lean();
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+
     if (existing) {
+        await User.updateOne({ _id: existing._id }, { $set: { password: passwordHash } });
         return NextResponse.json({
             ok: true,
-            message: 'Admin already exists',
+            message: 'Admin already exists (password updated)',
             user: { email: existing.email, id: String(existing._id) },
         });
     }
@@ -48,6 +56,7 @@ export async function POST(request: Request) {
         lastName,
         age: Number.isFinite(age) && age > 0 ? age : 30,
         email: adminEmail,
+        password: passwordHash,
     });
 
     return NextResponse.json({

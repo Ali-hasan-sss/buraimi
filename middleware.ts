@@ -5,6 +5,7 @@ import { jwtVerify } from 'jose';
 const protectedPaths = ['/dashboard'];
 const apiPrefix = '/api';
 const publicAuthApiPaths = new Set([
+    '/api/auth/login',
     '/api/auth/request-otp',
     '/api/auth/verify-otp',
     '/api/auth/seed-admin',
