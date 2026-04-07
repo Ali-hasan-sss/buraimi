@@ -12,6 +12,13 @@ function getAdminEmails() {
     .filter(Boolean);
 }
 
+function shouldUseSecureCookies(request: Request) {
+  if (process.env.AUTH_COOKIE_SECURE === "false") return false;
+  if (process.env.AUTH_COOKIE_SECURE === "true") return true;
+  if (process.env.NODE_ENV !== "production") return false;
+  return request.headers.get("x-forwarded-proto") === "https";
+}
+
 export async function POST(request: Request) {
   await dbConnect();
 
@@ -62,7 +69,7 @@ export async function POST(request: Request) {
   res.cookies.set("session", session, {
     expires,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(request),
     sameSite: "lax",
   });
 
