@@ -421,8 +421,7 @@ export function Hero({
 
   return (
     <section
-      className="relative overflow-hidden -mt-[112px] pt-[112px] w-full"
-      style={{ height: "calc(100vh + 3cm)", minHeight: "600px" }}
+      className="relative w-full overflow-hidden -mt-[112px] pt-[112px] h-[100svh] min-h-[560px] md:h-[calc(100vh+3cm)] md:min-h-[600px]"
     >
       <SideActionPanel contact={sidePanelContact} />
       {slides.map((slide, index) => (
@@ -486,7 +485,7 @@ export function Hero({
           </div>
         </>
       )}
-      <div className="absolute inset-0 px-16">
+      <div className="absolute inset-0 px-4 sm:px-6 md:px-10 lg:px-16">
         {isAdmin && (
           <div
             className={`absolute top-72 z-50 ${isAr ? "right-6 sm:right-10" : "left-6 sm:left-10"}`}
@@ -530,8 +529,8 @@ export function Hero({
           </div>
         )}
         {viewData.announcement && (
-          <div className="absolute bottom-16 left-16 z-20">
-            <div className="relative max-w-md">
+          <div className="absolute bottom-56 left-4 right-4 z-20 md:bottom-16 md:left-16 md:right-auto">
+            <div className="relative max-w-full md:max-w-md">
               {isAdmin && isEditing && (
                 <button
                   type="button"
@@ -549,7 +548,7 @@ export function Hero({
                     href={announcementLinkHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative block rounded-2xl bg-white p-6 shadow-2xl transition hover:ring-2 hover:ring-[#254151]/20"
+                    className="relative block rounded-2xl bg-white p-4 md:p-6 shadow-2xl transition hover:ring-2 hover:ring-[#254151]/20"
                   >
                     <AnnouncementCardBody
                       display={display}
@@ -565,7 +564,7 @@ export function Hero({
                 ) : (
                   <Link
                     href={normalizeInternalPath(announcementLinkHref)}
-                    className="relative block rounded-2xl bg-white p-6 shadow-2xl transition hover:ring-2 hover:ring-[#254151]/20"
+                    className="relative block rounded-2xl bg-white p-4 md:p-6 shadow-2xl transition hover:ring-2 hover:ring-[#254151]/20"
                   >
                     <AnnouncementCardBody
                       display={display}
@@ -580,7 +579,7 @@ export function Hero({
                   </Link>
                 )
               ) : (
-                <div className="relative rounded-2xl bg-white p-6 shadow-2xl">
+                <div className="relative rounded-2xl bg-white p-4 md:p-6 shadow-2xl">
                   <AnnouncementCardBody
                     display={display}
                     viewData={viewData}
@@ -597,17 +596,17 @@ export function Hero({
           </div>
         )}
         {isAdmin && !viewData.announcement && (
-          <div className="absolute bottom-16 left-16 z-20">
+          <div className="absolute bottom-56 left-4 right-4 z-20 md:bottom-16 md:left-16 md:right-auto">
             <button
               type="button"
-              className="rounded-xl bg-white px-5 py-3 font-semibold text-[#254151] shadow-2xl ring-1 ring-black/10 transition hover:bg-gray-50"
+              className="w-full md:w-auto rounded-xl bg-white px-5 py-3 font-semibold text-[#254151] shadow-2xl ring-1 ring-black/10 transition hover:bg-gray-50"
               onClick={handleAddAnnouncement}
             >
               {t("addAnnouncement")}
             </button>
           </div>
         )}
-        <div className="absolute bottom-0 right-16 max-w-3xl pb-16">
+        <div className="absolute bottom-14 left-4 right-4 pb-8 sm:bottom-16 sm:left-6 sm:right-6 md:bottom-0 md:left-auto md:right-16 md:max-w-3xl md:pb-16">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentSlide}
@@ -617,7 +616,7 @@ export function Hero({
               transition={{ duration: 0.55, ease: "easeOut" }}
             >
               <div className="flex items-start gap-2">
-                <motion.h1 className="text-[41px] md:text-4xl lg:text-5xl text-white font-bold leading-tight">
+                <motion.h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold leading-tight">
                   {display.title}
                 </motion.h1>
                 {isAdmin && isEditing && (
@@ -636,7 +635,7 @@ export function Hero({
                 )}
               </div>
               <div className="flex items-start gap-2">
-                <motion.p className="mb-5 text-lg leading-relaxed text-white/90 md:text-xl">
+                <motion.p className="mb-4 text-sm sm:text-base leading-relaxed text-white/90 md:mb-5 md:text-xl">
                   {display.subtitle}
                 </motion.p>
                 {isAdmin && isEditing && (
@@ -660,7 +659,7 @@ export function Hero({
                   {showSlideCta && (
                     <Button
                       size="lg"
-                      className="bg-[#6096b4] hover:bg-[#c2a772] text-white font-bold px-8 py-6 text-lg shadow-xl"
+                      className="bg-[#6096b4] hover:bg-[#c2a772] text-white font-bold px-5 py-4 text-sm sm:text-base md:px-8 md:py-6 md:text-lg shadow-xl"
                       onClick={() => {
                         const href = currentSlideData.ctaLink.trim();
                         if (href) window.location.href = href;
@@ -691,7 +690,7 @@ export function Hero({
             </motion.div>
           </AnimatePresence>
         </div>
-        <div className="absolute bottom-8 right-16 z-20 flex items-center gap-2">
+        <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 md:bottom-8 md:left-auto md:right-16 md:translate-x-0">
           {slides.map((_, index) => (
             <button
               key={index}
@@ -706,7 +705,7 @@ export function Hero({
         onClick={() =>
           setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
         }
-        className="absolute left-8 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-3 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-white/40"
+        className="absolute left-8 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-white/20 p-3 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-white/40 md:block"
         aria-label={t("prevSlide")}
       >
         <ChevronLeft className="size-6" />
@@ -714,7 +713,7 @@ export function Hero({
       <button
         type="button"
         onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-        className="absolute right-8 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-3 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-white/40"
+        className="absolute right-8 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-white/20 p-3 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-white/40 md:block"
         aria-label={t("nextSlide")}
       >
         <ChevronRight className="size-6" />

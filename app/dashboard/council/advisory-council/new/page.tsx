@@ -1,17 +1,23 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { AdvisoryCouncilMember } from "@/models/AdvisoryCouncil";
 
 import MemberForm from "@/components/dashboard/council/MemberForm";
+import {
+    getCouncilMemberImagePath,
+    getFormString,
+} from "@/lib/server-action-form-data";
 
 async function createMember(formData: FormData) {
     "use server";
 
-    const name = String(formData.get("name") || "").trim();
-    const role = String(formData.get("role") || "").trim();
-    const description = String(formData.get("description") || "").trim();
+    const name = getFormString(formData, "name");
+    const role = getFormString(formData, "role");
+    const description = getFormString(formData, "description");
+    const image = getCouncilMemberImagePath(formData);
 
     if (!name || !role) {
         return;
@@ -22,18 +28,20 @@ async function createMember(formData: FormData) {
     const safeDescription = role === "member" || role === "industry" ? "" : description;
     const passedRole = role == "member" ? "عضو" : role;
 
-    await AdvisoryCouncilMember.create({ name, role: passedRole, description: safeDescription });
+    await AdvisoryCouncilMember.create({ name, role: passedRole, description: safeDescription, image });
 
     revalidatePath("/dashboard/council/advisory-council");
     redirect("/dashboard/council/advisory-council");
 }
 
 export default async function NewAdvisoryCouncilMemberPage() {
+    const t = await getTranslations("dashboardCouncil");
+
     return (
         <div className="max-w-xl space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Add new member</h1>
-                <p className="text-sm text-muted-foreground">Advisory Council</p>
+                <h1 className="text-2xl font-semibold tracking-tight">{t("newMemberTitle")}</h1>
+                <p className="text-sm text-muted-foreground">{t("advisoryTitle")}</p>
             </div>
 
             <MemberForm action={createMember} />

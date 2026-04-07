@@ -139,9 +139,9 @@ export function GraduateStudies({ programs: programsProp }: Props) {
                 </div>
 
                 {/* Program Title */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 2xl:p-8">
+                <div className="absolute bottom-0 left-0 right-0 flex items-end bg-gradient-to-t from-black/70 via-black/35 to-transparent p-3 sm:p-4 lg:p-5 2xl:p-6 min-h-[38%]">
                   <h3
-                    className="md:text-lg xl:text-2xl 2xl:text-[51px] text-white leading-relaxed group-hover:translate-y-[-8px] transition-transform duration-300"
+                    className="text-sm sm:text-base md:text-lg xl:text-xl 2xl:text-2xl text-white leading-snug break-words transition-transform duration-300 group-hover:translate-y-[-4px]"
                     style={{ fontFamily: "Cairo" }}
                   >
                     {isRtl ? program.titleAr : program.titleEn}

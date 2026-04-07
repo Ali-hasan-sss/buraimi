@@ -26,14 +26,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = (await request.json()) as {
         name?: string;
         role?: string;
+        image?: string;
     };
 
-    const update: { name?: string; role?: string } = {};
+    const update: { name?: string; role?: string; image?: string } = {};
 
     if (typeof body.name === 'string') update.name = body.name.trim();
     if (typeof body.role === 'string') update.role = body.role.trim();
+    if (typeof body.image === 'string') update.image = body.image.trim();
 
-    if (!update.name && !update.role) {
+    if (!update.name && !update.role && typeof update.image !== 'string') {
         return NextResponse.json({ ok: false, message: 'No fields to update' }, { status: 400 });
     }
 

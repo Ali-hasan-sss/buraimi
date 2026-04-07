@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { BoardTrustee } from "@/models/BoardTrustees";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 type TrusteeDoc = {
     _id: unknown;
     name: string;
     role: string;
+    image?: string;
 };
 
 async function deleteMember(formData: FormData) {
@@ -23,6 +26,7 @@ async function deleteMember(formData: FormData) {
 }
 
 export default async function Trust() {
+    const t = await getTranslations("dashboardCouncil");
     await dbConnect();
     const members = (await BoardTrustee.find({}).sort({ createdAt: -1 }).lean()) as TrusteeDoc[];
 
@@ -30,11 +34,11 @@ export default async function Trust() {
         <div className="space-y-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">Board of Trustees</h1>
-                    <p className="text-sm text-muted-foreground">Manage members</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">{t("trusteesTitle")}</h1>
+                    <p className="text-sm text-muted-foreground">{t("manageMembers")}</p>
                 </div>
                 <Button asChild className="w-full sm:w-auto">
-                    <Link href="/dashboard/council/board-trustees/new">Add new member</Link>
+                    <Link href="/dashboard/council/board-trustees/new">{t("addMember")}</Link>
                 </Button>
             </div>
 
@@ -43,35 +47,45 @@ export default async function Trust() {
                     <table className="w-max min-w-full text-sm">
                         <thead className="bg-muted/50 ">
                             <tr className="text-left">
-                                <th className="hidden px-4 py-3 font-medium text-start sm:table-cell">ID</th>
-                                <th className="px-4 py-3 font-medium text-start">Name</th>
-                                <th className="px-4 py-3 font-medium text-start">Role</th>
-                                <th className="px-4 py-3 font-medium text-start">Action</th>
+                                <th className="hidden px-4 py-3 font-medium text-start sm:table-cell">{t("tableId")}</th>
+                                <th className="px-4 py-3 font-medium text-start">{t("tablePhoto")}</th>
+                                <th className="px-4 py-3 font-medium text-start">{t("tableName")}</th>
+                                <th className="px-4 py-3 font-medium text-start">{t("tableRole")}</th>
+                                <th className="px-4 py-3 font-medium text-start">{t("tableAction")}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {members.length === 0 ? (
                                 <tr>
-                                    <td className="px-4 py-6 text-muted-foreground" colSpan={4}>
-                                        No members found.
+                                    <td className="px-4 py-6 text-muted-foreground" colSpan={5}>
+                                        {t("emptyMembers")}
                                     </td>
                                 </tr>
                             ) : (
                                 members.map((m) => (
                                     <tr key={String(m._id)} className="border-t">
                                         <td className="hidden px-4 py-3 font-mono text-xs sm:table-cell">{String(m._id)}</td>
+                                        <td className="px-4 py-3">
+                                            {m.image ? (
+                                                <div className="relative size-10 overflow-hidden rounded-md border">
+                                                    <Image src={m.image} alt={m.name} fill className="object-cover" sizes="40px" />
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted-foreground">—</span>
+                                            )}
+                                        </td>
                                         <td className="px-4 py-3 whitespace-nowrap">{m.name}</td>
                                         <td className="px-4 py-3 whitespace-nowrap">{m.role}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                                                 <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
-                                                    <Link href={`/dashboard/council/board-trustees/${String(m._id)}`}>Update</Link>
+                                                    <Link href={`/dashboard/council/board-trustees/${String(m._id)}`}>{t("update")}</Link>
                                                 </Button>
 
                                                 <form action={deleteMember} className="w-full sm:w-auto">
                                                     <input type="hidden" name="id" value={String(m._id)} />
                                                     <Button type="submit" variant="destructive" size="sm" className="w-full sm:w-auto">
-                                                        Delete
+                                                        {t("delete")}
                                                     </Button>
                                                 </form>
                                             </div>

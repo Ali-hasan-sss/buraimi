@@ -1,30 +1,44 @@
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { BoardTrustee } from "@/models/BoardTrustees";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CouncilMemberAvatarUpload } from "@/components/dashboard/council/CouncilMemberAvatarUpload";
+import {
+    getCouncilMemberImagePath,
+    getFormString,
+} from "@/lib/server-action-form-data";
 
 type TrusteeDoc = {
     _id: unknown;
     name: string;
     role: string;
+    image?: string;
 };
 
-async function updateMember(id: string, formData: FormData) {
+async function updateMember(formData: FormData) {
     "use server";
 
-    const name = String(formData.get("name") || "").trim();
-    const role = String(formData.get("role") || "").trim();
+    const id = getFormString(formData, "memberId");
+    const name = getFormString(formData, "name");
+    const role = getFormString(formData, "role");
+    const image = getCouncilMemberImagePath(formData);
 
-    if (!name || !role) {
+    if (!id || !name || !role) {
         return;
     }
 
     await dbConnect();
-    await BoardTrustee.findByIdAndUpdate(id, { name, role });
+
+    await BoardTrustee.findByIdAndUpdate(
+        id,
+        { $set: { name, role, image } },
+        { new: true },
+    );
 
     revalidatePath("/dashboard/council/board-trustees");
     redirect("/dashboard/council/board-trustees");
@@ -32,6 +46,7 @@ async function updateMember(id: string, formData: FormData) {
 
 export default async function UpdateTrusteePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
+    const t = await getTranslations("dashboardCouncil");
 
     await dbConnect();
     const member = (await BoardTrustee.findById(id).lean()) as TrusteeDoc | null;
@@ -40,28 +55,29 @@ export default async function UpdateTrusteePage({ params }: { params: Promise<{ 
         notFound();
     }
 
-    const action = updateMember.bind(null, id);
-
     return (
         <div className="max-w-xl space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Update member</h1>
-                <p className="text-sm text-muted-foreground">Board of Trustees</p>
+                <h1 className="text-2xl font-semibold tracking-tight">{t("updateMemberTitle")}</h1>
+                <p className="text-sm text-muted-foreground">{t("trusteesTitle")}</p>
             </div>
 
-            <form action={action} className="space-y-4 rounded-xl border bg-background p-4">
+            <form action={updateMember} className="space-y-4 rounded-xl border bg-background p-4">
+                <input type="hidden" name="memberId" value={id} />
                 <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="name">Name</label>
+                    <label className="text-sm font-medium" htmlFor="name">{t("nameLabel")}</label>
                     <Input id="name" name="name" defaultValue={member.name} required />
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="role">Role</label>
+                    <label className="text-sm font-medium" htmlFor="role">{t("roleLabel")}</label>
                     <Input id="role" name="role" defaultValue={member.role} required />
                 </div>
 
+                <CouncilMemberAvatarUpload defaultPath={member.image} />
+
                 <div className="flex items-center justify-end gap-2">
-                    <Button type="submit" className="w-full sm:w-auto">Save</Button>
+                    <Button type="submit" className="w-full sm:w-auto">{t("save")}</Button>
                 </div>
             </form>
         </div>

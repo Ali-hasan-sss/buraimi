@@ -36,15 +36,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             name?: string;
             role?: string;
             description?: string;
+            image?: string;
         };
 
-        const update: { name?: string; role?: string; description?: string } = {};
+        const update: { name?: string; role?: string; description?: string; image?: string } = {};
 
         if (typeof body.name === 'string') update.name = body.name.trim();
         if (typeof body.role === 'string') update.role = body.role.trim();
         if (typeof body.description === 'string') update.description = body.description.trim();
+        if (typeof body.image === 'string') update.image = body.image.trim();
 
-        if (!update.name && !update.role && typeof update.description !== 'string') {
+        if (!update.name && !update.role && typeof update.description !== 'string' && typeof update.image !== 'string') {
             return NextResponse.json({ ok: false, message: 'No fields to update' }, { status: 400 });
         }
 

@@ -6,11 +6,14 @@ import { motion } from "framer-motion"
 import { fetchBoardTrustees } from "@/store/contentSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
+import { CouncilMemberAvatar } from "@/components/about/CouncilMemberAvatar";
+
 export default function AccreditationCouncilContent() {
     type Trustee = {
         _id: string;
         name: string;
         role: string;
+        image?: string;
     };
 
     const dispatch = useAppDispatch();
@@ -34,7 +37,7 @@ export default function AccreditationCouncilContent() {
             glowClassName:
                 "absolute -inset-1 bg-gradient-to-r from-[#254151] to-[#6096b4] rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition duration-300",
             avatarClassName:
-                "relative w-32 h-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl flex items-center justify-center",
+                "h-32 w-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl",
             roleClassName: "inline-block px-4 py-2 bg-gradient-to-r from-[#254151] to-[#2d4a5c] rounded-full",
             icon: Shield,
         },
@@ -44,7 +47,7 @@ export default function AccreditationCouncilContent() {
             glowClassName:
                 "absolute -inset-1 bg-gradient-to-r from-[#6096b4] to-[#c2a772] rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition duration-300",
             avatarClassName:
-                "relative w-32 h-32 mx-auto bg-gradient-to-br from-[#6096b4] to-[#7aa5be] rounded-2xl flex items-center justify-center",
+                "h-32 w-32 mx-auto bg-gradient-to-br from-[#6096b4] to-[#7aa5be] rounded-2xl",
             roleClassName: "inline-block px-4 py-2 bg-gradient-to-r from-[#6096b4] to-[#7aa5be] rounded-full",
             icon: Shield,
         },
@@ -54,7 +57,7 @@ export default function AccreditationCouncilContent() {
             glowClassName:
                 "absolute -inset-1 bg-gradient-to-r from-[#c2a772] to-[#6096b4] rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition duration-300",
             avatarClassName:
-                "relative w-32 h-32 mx-auto bg-gradient-to-br from-[#c2a772] to-[#d4b883] rounded-2xl flex items-center justify-center",
+                "h-32 w-32 mx-auto bg-gradient-to-br from-[#c2a772] to-[#d4b883] rounded-2xl",
             roleClassName: "inline-block px-4 py-2 bg-gradient-to-r from-[#c2a772] to-[#d4b883] rounded-full",
             icon: GraduationCap,
         },
@@ -129,15 +132,17 @@ export default function AccreditationCouncilContent() {
                                                         : (special?.glowClassName || "absolute -inset-1 bg-gradient-to-r from-[#254151] to-[#6096b4] rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition duration-300")
                                                 }
                                             ></div>
-                                            <div
+                                            <CouncilMemberAvatar
+                                                image={m.image}
+                                                name={m.name}
+                                                fallback={Icon}
                                                 className={
                                                     isMember
-                                                        ? "relative w-28 h-28 mx-auto bg-gradient-to-br from-[#6096b4] to-[#7aa5be] rounded-2xl flex items-center justify-center"
-                                                        : (special?.avatarClassName || "relative w-32 h-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl flex items-center justify-center")
+                                                        ? "h-28 w-28 mx-auto bg-gradient-to-br from-[#6096b4] to-[#7aa5be] rounded-2xl"
+                                                        : (special?.avatarClassName || "h-32 w-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl")
                                                 }
-                                            >
-                                                <Icon className={isMember ? "size-14 text-white" : "size-16 text-white"} />
-                                            </div>
+                                                iconClassName={isMember ? "size-14 text-white" : "size-16 text-white"}
+                                            />
                                         </div>
 
                                         <div className="space-y-3">

@@ -1,32 +1,35 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 
 import { Briefcase, GraduationCap, Landmark, Users } from "lucide-react";
 
-export default function CouncilPage() {
+export default async function CouncilPage() {
+    const t = await getTranslations("dashboardCouncil");
+
     const sections = [
         {
-            title: "Board of Trustees",
-            description: "Manage trustees members",
+            title: t("trusteesTitle"),
+            description: t("trusteesDesc"),
             href: "/dashboard/council/board-trustees",
             icon: Landmark,
         },
         {
-            title: "Board of Directors",
-            description: "Manage directors members",
+            title: t("directorsTitle"),
+            description: t("directorsDesc"),
             href: "/dashboard/council/board-directors",
             icon: Users,
         },
         {
-            title: "Advisory Council",
-            description: "Manage advisory council members",
+            title: t("advisoryTitle"),
+            description: t("advisoryDesc"),
             href: "/dashboard/council/advisory-council",
             icon: Briefcase,
         },
         {
-            title: "College Council",
-            description: "Manage college council members",
+            title: t("collegeTitle"),
+            description: t("collegeDesc"),
             href: "/dashboard/council/college-council",
             icon: GraduationCap,
         },
@@ -35,10 +38,8 @@ export default function CouncilPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Council</h1>
-                <p className="text-sm text-muted-foreground">
-                    أختر مجلس لتعديل بيانات اعضائه
-                </p>
+                <h1 className="text-2xl font-semibold tracking-tight">{t("hubTitle")}</h1>
+                <p className="text-sm text-muted-foreground">{t("hubSubtitle")}</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
@@ -58,7 +59,7 @@ export default function CouncilPage() {
 
                             <div className="mt-4">
                                 <Button asChild className="w-full">
-                                    <Link href={s.href}>Open</Link>
+                                    <Link href={s.href}>{t("open")}</Link>
                                 </Button>
                             </div>
                         </div>

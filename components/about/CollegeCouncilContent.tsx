@@ -1,15 +1,18 @@
 "use client"
 import { Briefcase, GraduationCap, Users } from "lucide-react";
 
-import { motion, type Variants } from "framer-motion"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react";
 
+import { CouncilMemberAvatar } from "@/components/about/CouncilMemberAvatar";
+
 type CollegeCouncil = {
-    name: string,
-    role: string,
-    description: string,
-    _id: string
-}
+    name: string;
+    role: string;
+    description: string;
+    _id: string;
+    image?: string;
+};
 
 export default function CollegeCouncilContent() {
 
@@ -88,9 +91,13 @@ export default function CollegeCouncilContent() {
                             <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border-2 border-[#254151] shadow-lg hover:shadow-2xl transition-all duration-300 text-center">
                                 <div className="relative inline-block mb-6">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-[#254151] to-[#6096b4] rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition duration-300"></div>
-                                    <div className="relative w-32 h-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl flex items-center justify-center">
-                                        <Users className="size-16 text-white" />
-                                    </div>
+                                    <CouncilMemberAvatar
+                                        image={member.image}
+                                        name={member.name}
+                                        fallback={Users}
+                                        className="h-32 w-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl"
+                                        iconClassName="size-16 text-white"
+                                    />
                                 </div>
 
                                 <div className="space-y-3">
@@ -133,9 +140,13 @@ export default function CollegeCouncilContent() {
                             <div className="bg-gradient-to-br from-white to-blue-50/50 p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 text-center h-full">
                                 <div className="relative inline-block mb-4">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-[#6096b4] to-[#c2a772] rounded-xl blur-sm opacity-30 group-hover:opacity-60 transition duration-300"></div>
-                                    <div className="relative w-20 h-20 mx-auto bg-gradient-to-br from-[#6096b4] to-[#7aa5be] rounded-xl flex items-center justify-center">
-                                        <GraduationCap className="size-10 text-white" />
-                                    </div>
+                                    <CouncilMemberAvatar
+                                        image={member.image}
+                                        name={member.name}
+                                        fallback={GraduationCap}
+                                        className="mx-auto h-20 w-20 bg-gradient-to-br from-[#6096b4] to-[#7aa5be] rounded-xl"
+                                        iconClassName="size-10 text-white"
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
@@ -169,9 +180,13 @@ export default function CollegeCouncilContent() {
                                 <div className="flex items-start gap-4">
                                     <div className="relative shrink-0">
                                         <div className="absolute -inset-1 bg-gradient-to-r from-[#c2a772] to-[#6096b4] rounded-lg blur-sm opacity-30 group-hover:opacity-60 transition duration-300"></div>
-                                        <div className="relative w-16 h-16 bg-gradient-to-br from-[#c2a772] to-[#d4b883] rounded-lg flex items-center justify-center">
-                                            <Briefcase className="size-8 text-white" />
-                                        </div>
+                                        <CouncilMemberAvatar
+                                            image={member.image}
+                                            name={member.name}
+                                            fallback={Briefcase}
+                                            className="h-16 w-16 bg-gradient-to-br from-[#c2a772] to-[#d4b883] rounded-lg"
+                                            iconClassName="size-8 text-white"
+                                        />
                                     </div>
 
                                     <div className="flex-1">

@@ -16,12 +16,14 @@ type BoardDirector = {
     _id: string;
     name: string;
     role: string;
+    image?: string;
 };
 
 type Trustee = {
     _id: string;
     name: string;
     role: string;
+    image?: string;
 };
 
 type MessageParagraph = {

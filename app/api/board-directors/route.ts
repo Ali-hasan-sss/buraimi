@@ -25,16 +25,18 @@ export async function POST(request: Request) {
         const body = (await request.json()) as {
             name?: string;
             role?: string;
+            image?: string;
         };
 
         const name = (body.name || '').trim();
         const role = (body.role || '').trim();
+        const image = typeof body.image === 'string' ? body.image.trim() : '';
 
         if (!name || !role) {
             return NextResponse.json({ ok: false, message: 'Missing name or role' }, { status: 400 });
         }
 
-        const created = await BoardDirector.create({ name, role });
+        const created = await BoardDirector.create({ name, role, image });
 
         return NextResponse.json({ ok: true, data: created }, { status: 201 });
     } catch (e) {

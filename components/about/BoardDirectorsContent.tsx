@@ -8,10 +8,13 @@ import { motion } from "framer-motion"
 import { fetchBoardDirectors } from "@/store/contentSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
+import { CouncilMemberAvatar } from "@/components/about/CouncilMemberAvatar";
+
 type BoardDirector = {
     _id: string;
     name: string;
     role: string;
+    image?: string;
 };
 
 export default function BoardDirectorsContent() {
@@ -106,15 +109,13 @@ export default function BoardDirectorsContent() {
                                     <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border-2 border-[#254151] shadow-lg hover:shadow-2xl transition-all duration-300 text-center">
                                         <div className="relative inline-block mb-6">
                                             <div className="absolute -inset-1 bg-gradient-to-r from-[#254151] to-[#6096b4] rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition duration-300"></div>
-                                            <div className="relative w-32 h-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl flex items-center justify-center">
-                                                {
-                                                    data.role === "عضو" ? (
-                                                        <UserCheck className="size-14 text-white" />
-                                                    ) : (
-                                                        <Users className="size-16 text-white" />
-                                                    )
-                                                }
-                                            </div>
+                                            <CouncilMemberAvatar
+                                                image={data.image}
+                                                name={data.name}
+                                                fallback={data.role === "عضو" ? UserCheck : Users}
+                                                className="h-32 w-32 mx-auto bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-2xl"
+                                                iconClassName={data.role === "عضو" ? "size-14 text-white" : "size-16 text-white"}
+                                            />
                                         </div>
 
                                         <div className="space-y-3">

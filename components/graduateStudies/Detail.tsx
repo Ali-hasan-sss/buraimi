@@ -45,7 +45,7 @@ export default function DetailPageComp({
   /** Bottom→top gradient over the hero image (from program `color`) */
   heroOverlayStyle?: CSSProperties;
 }) {
-  const locale = useLocale();
+    const locale = useLocale();
   const isRtl = locale === "ar";
   const [activeTab, setActiveTab] = useState<Tab>("public");
 
@@ -167,8 +167,8 @@ export default function DetailPageComp({
 
   const t = useTranslations("graduate");
 
-  const heroTitle = isRtl ? programInfo.titleAr : programInfo.titleEn;
-  const heroSubtitle = isRtl ? programInfo.titleEn : programInfo.titleAr;
+    const heroTitle = isRtl ? programInfo.titleAr : programInfo.titleEn;
+    const heroSubtitle = isRtl ? programInfo.titleEn : programInfo.titleAr;
   const heroAffiliation = isRtl
     ? programInfo.affiliationAr
     : programInfo.affiliationEn;
@@ -570,10 +570,10 @@ export default function DetailPageComp({
           ? t("outcomesTitle")
           : t("requirementsTitle");
 
-  return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[320px] sm:h-[360px] lg:h-[420px] overflow-hidden">
+    return (
+        <div className="min-h-screen">
+            {/* Hero Section */}
+            <section className="relative h-[320px] sm:h-[360px] lg:h-[420px] overflow-hidden">
         {isAdmin ? (
           <button
             type="button"
@@ -586,106 +586,106 @@ export default function DetailPageComp({
             <span className="text-sm font-semibold">{t("editorEditDetails")}</span>
           </button>
         ) : null}
-        <Image
+                <Image
           src={resolvedHeroSrc}
-          alt={heroTitle}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
+                    alt={heroTitle}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="100vw"
           unoptimized={
             typeof resolvedHeroSrc === "string" &&
             (resolvedHeroSrc.startsWith("/uploads/") ||
               resolvedHeroSrc.startsWith("data:"))
           }
-        />
+                />
         <div className="absolute inset-0" style={resolvedHeroOverlay} />
 
-        <div className="relative h-full flex items-center justify-center text-white text-center px-4">
-          <div className="max-w-5xl">
-            <div className="flex justify-center mb-4 sm:mb-6">
-              <div className="bg-white/20 backdrop-blur-sm p-4 sm:p-5 rounded-full">
-                <Award className="size-12 sm:size-14 lg:size-16 text-white" />
-              </div>
-            </div>
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
-              {heroTitle}
-            </h1>
+                <div className="relative h-full flex items-center justify-center text-white text-center px-4">
+                    <div className="max-w-5xl">
+                        <div className="flex justify-center mb-4 sm:mb-6">
+                            <div className="bg-white/20 backdrop-blur-sm p-4 sm:p-5 rounded-full">
+                                <Award className="size-12 sm:size-14 lg:size-16 text-white" />
+                            </div>
+                        </div>
+                        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+                            {heroTitle}
+                        </h1>
             <p className="text-sm sm:text-lg lg:text-xl opacity-95 mb-3 sm:mb-4">
               {heroSubtitle}
             </p>
-            <div className="flex items-center justify-center gap-2 text-sm sm:text-base lg:text-lg">
-              <Globe className="size-4 sm:size-5" />
-              <span>{heroAffiliation}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+                        <div className="flex items-center justify-center gap-2 text-sm sm:text-base lg:text-lg">
+                            <Globe className="size-4 sm:size-5" />
+                            <span>{heroAffiliation}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-      {/* Quick Info */}
-      <section className="py-10 sm:py-12 bg-white border-b-2 border-gray-100">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-red-100 to-red-50 p-4 rounded-lg mb-3">
-                <Clock className="size-7 sm:size-8 text-red-600 mx-auto" />
-              </div>
+            {/* Quick Info */}
+            <section className="py-10 sm:py-12 bg-white border-b-2 border-gray-100">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-red-100 to-red-50 p-4 rounded-lg mb-3">
+                                <Clock className="size-7 sm:size-8 text-red-600 mx-auto" />
+                            </div>
               <div className="text-xs sm:text-sm text-gray-600 mb-1">
                 {t("quickDuration")}
               </div>
-              <div className="font-bold text-[#254151] text-sm sm:text-base">
-                {isRtl ? programInfo.durationAr : programInfo.durationEn}
-              </div>
-            </div>
+                            <div className="font-bold text-[#254151] text-sm sm:text-base">
+                                {isRtl ? programInfo.durationAr : programInfo.durationEn}
+                            </div>
+                        </div>
 
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-4 rounded-lg mb-3">
-                <FileText className="size-7 sm:size-8 text-blue-600 mx-auto" />
-              </div>
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-4 rounded-lg mb-3">
+                                <FileText className="size-7 sm:size-8 text-blue-600 mx-auto" />
+                            </div>
               <div className="text-xs sm:text-sm text-gray-600 mb-1">
                 {t("quickTotalCredits")}
               </div>
-              <div className="font-bold text-[#254151] text-sm sm:text-base">
+                            <div className="font-bold text-[#254151] text-sm sm:text-base">
                 {isRtl
                   ? programInfo.totalCreditsAr
                   : programInfo.totalCreditsEn}
-              </div>
-            </div>
+                            </div>
+                        </div>
 
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-green-100 to-green-50 p-4 rounded-lg mb-3">
-                <BookOpen className="size-7 sm:size-8 text-green-600 mx-auto" />
-              </div>
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-green-100 to-green-50 p-4 rounded-lg mb-3">
+                                <BookOpen className="size-7 sm:size-8 text-green-600 mx-auto" />
+                            </div>
               <div className="text-xs sm:text-sm text-gray-600 mb-1">
                 {t("quickCourseCredits")}
               </div>
-              <div className="font-bold text-[#254151] text-sm sm:text-base">
+                            <div className="font-bold text-[#254151] text-sm sm:text-base">
                 {isRtl
                   ? programInfo.courseCreditsAr
                   : programInfo.courseCreditsEn}
-              </div>
-            </div>
+                            </div>
+                        </div>
 
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-4 rounded-lg mb-3">
-                <GraduationCap className="size-7 sm:size-8 text-purple-600 mx-auto" />
-              </div>
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-4 rounded-lg mb-3">
+                                <GraduationCap className="size-7 sm:size-8 text-purple-600 mx-auto" />
+                            </div>
               <div className="text-xs sm:text-sm text-gray-600 mb-1">
                 {t("quickThesisCredits")}
               </div>
-              <div className="font-bold text-[#254151] text-sm sm:text-base">
+                            <div className="font-bold text-[#254151] text-sm sm:text-base">
                 {isRtl
                   ? programInfo.thesisCreditsAr
                   : programInfo.thesisCreditsEn}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-      {/* About Program */}
-      <section className="py-12 sm:py-16 bg-gray-50">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
+            {/* About Program */}
+            <section className="py-12 sm:py-16 bg-gray-50">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
           {isAdmin ? (
             <div className="flex justify-end mb-6">
               <button
@@ -698,124 +698,124 @@ export default function DetailPageComp({
               </button>
             </div>
           ) : null}
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10 sm:mb-12">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-10 sm:mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#254151] mb-3 sm:mb-4">
                 {t("aboutTitle")}
               </h2>
-              <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto" />
-            </div>
+                            <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto" />
+                        </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-5 sm:p-8 border-2 border-gray-100">
-              <div className="bg-gradient-to-r from-red-50 to-orange-50 border-r-4 border-red-500 p-5 sm:p-6 rounded-lg mb-6">
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#254151]">
+                        <div className="bg-white rounded-lg shadow-lg p-5 sm:p-8 border-2 border-gray-100">
+                            <div className="bg-gradient-to-r from-red-50 to-orange-50 border-r-4 border-red-500 p-5 sm:p-6 rounded-lg mb-6">
+                                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#254151]">
                   {isRtl ? aboutHeadlineAr : aboutHeadlineEn}
-                </h3>
-              </div>
+                                </h3>
+                            </div>
 
-              <div className="text-gray-700 space-y-5">
-                <p className="text-sm sm:text-base lg:text-lg leading-relaxed">
+                            <div className="text-gray-700 space-y-5">
+                                <p className="text-sm sm:text-base lg:text-lg leading-relaxed">
                   {isRtl ? aboutTextAr : aboutTextEn}
-                </p>
+                                </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-blue-50 p-5 sm:p-6 rounded-lg border-2 border-blue-200">
-                    <h4 className="font-bold text-[#254151] mb-3 flex items-center gap-2 text-sm sm:text-base">
-                      <Users className="size-4 sm:size-5 text-blue-600" />
-                      {t("studyModeLabel")}
-                    </h4>
-                    <p className="text-sm sm:text-base">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                    <div className="bg-blue-50 p-5 sm:p-6 rounded-lg border-2 border-blue-200">
+                                        <h4 className="font-bold text-[#254151] mb-3 flex items-center gap-2 text-sm sm:text-base">
+                                            <Users className="size-4 sm:size-5 text-blue-600" />
+                                            {t("studyModeLabel")}
+                                        </h4>
+                                        <p className="text-sm sm:text-base">
                       {isRtl
                         ? `يتم تقديم البرنامج ${programInfo.studyModeAr}`
                         : `This program is offered ${programInfo.studyModeEn}`}
-                    </p>
-                  </div>
+                                        </p>
+                                    </div>
 
-                  <div className="bg-green-50 p-5 sm:p-6 rounded-lg border-2 border-green-200">
-                    <h4 className="font-bold text-[#254151] mb-3 flex items-center gap-2 text-sm sm:text-base">
-                      <Target className="size-4 sm:size-5 text-green-600" />
-                      {t("programDimensionsLabel")}
-                    </h4>
+                                    <div className="bg-green-50 p-5 sm:p-6 rounded-lg border-2 border-green-200">
+                                        <h4 className="font-bold text-[#254151] mb-3 flex items-center gap-2 text-sm sm:text-base">
+                                            <Target className="size-4 sm:size-5 text-green-600" />
+                                            {t("programDimensionsLabel")}
+                                        </h4>
                     <p className="text-sm sm:text-base">
                       {programDimensionsText}
                     </p>
-                  </div>
-                </div>
+                                    </div>
+                                </div>
 
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-5 sm:p-6 rounded-lg border-2 border-amber-300">
+                                <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-5 sm:p-6 rounded-lg border-2 border-amber-300">
                   <h4 className="font-bold text-[#254151] mb-3 text-base sm:text-lg lg:text-xl">
                     {graduationTitleText}
                   </h4>
                   <p className="text-sm sm:text-base lg:text-lg leading-relaxed">
                     {graduationTextText}
                   </p>
-                </div>
+                                </div>
 
-                <div className="bg-purple-50 p-5 sm:p-6 rounded-lg border-2 border-purple-200">
+                                <div className="bg-purple-50 p-5 sm:p-6 rounded-lg border-2 border-purple-200">
                   <h4 className="font-bold text-[#254151] mb-3 text-base sm:text-lg lg:text-xl">
                     {creditsTitleText}
                   </h4>
                   <p className="text-sm sm:text-base lg:text-lg mb-4">
                     {creditsTextText}
                   </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle className="size-4 sm:size-5 text-purple-600 flex-shrink-0 mt-1" />
+                                    <ul className="space-y-2">
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="size-4 sm:size-5 text-purple-600 flex-shrink-0 mt-1" />
                       <span className="text-sm sm:text-base leading-relaxed">
                         {creditsBullet1Text}
                       </span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle className="size-4 sm:size-5 text-purple-600 flex-shrink-0 mt-1" />
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircle className="size-4 sm:size-5 text-purple-600 flex-shrink-0 mt-1" />
                       <span className="text-sm sm:text-base leading-relaxed">
                         {creditsBullet2Text}
                       </span>
-                    </li>
-                  </ul>
-                </div>
+                                        </li>
+                                    </ul>
+                                </div>
 
-                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 p-5 sm:p-6 rounded-lg border-2 border-indigo-300">
+                                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 p-5 sm:p-6 rounded-lg border-2 border-indigo-300">
                   <h4 className="font-bold text-[#254151] mb-3 text-base sm:text-lg lg:text-xl">
                     {tracksTitleText}
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-lg border-2 border-indigo-200">
-                      <div className="flex items-center gap-3">
-                        <Award className="size-7 sm:size-8 text-indigo-600" />
-                        <div>
-                          <h5 className="font-bold text-[#254151] text-sm sm:text-base">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-white p-4 rounded-lg border-2 border-indigo-200">
+                                            <div className="flex items-center gap-3">
+                                                <Award className="size-7 sm:size-8 text-indigo-600" />
+                                                <div>
+                                                    <h5 className="font-bold text-[#254151] text-sm sm:text-base">
                             {trackPublicText}
-                          </h5>
-                          <p className="text-xs sm:text-sm text-gray-600">
+                                                    </h5>
+                                                    <p className="text-xs sm:text-sm text-gray-600">
                             {trackPublicText}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg border-2 border-indigo-200">
-                      <div className="flex items-center gap-3">
-                        <Award className="size-7 sm:size-8 text-indigo-600" />
-                        <div>
-                          <h5 className="font-bold text-[#254151] text-sm sm:text-base">
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-4 rounded-lg border-2 border-indigo-200">
+                                            <div className="flex items-center gap-3">
+                                                <Award className="size-7 sm:size-8 text-indigo-600" />
+                                                <div>
+                                                    <h5 className="font-bold text-[#254151] text-sm sm:text-base">
                             {trackPrivateText}
-                          </h5>
-                          <p className="text-xs sm:text-sm text-gray-600">
+                                                    </h5>
+                                                    <p className="text-xs sm:text-sm text-gray-600">
                             {trackPrivateText}
-                          </p>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            </section>
 
-      {/* Objectives */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
+            {/* Objectives */}
+            <section className="py-12 sm:py-16 bg-white">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
           {isAdmin ? (
             <div className="flex justify-end mb-6">
               <button
@@ -828,43 +828,43 @@ export default function DetailPageComp({
               </button>
             </div>
           ) : null}
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10 sm:mb-12">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-10 sm:mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#254151] mb-3 sm:mb-4">
                 {t("objectivesTitle")}
               </h2>
-              <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto mb-3 sm:mb-4" />
+                            <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto mb-3 sm:mb-4" />
               <p className="text-sm sm:text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
                 {t("objectivesSubtitle")}
               </p>
-            </div>
+                        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {(isRtl ? objectives.ar : objectives.en).map(
                 (objective, index) => (
-                  <div
-                    key={index}
-                    className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 sm:p-6 rounded-lg border-2 border-blue-200 hover:shadow-lg transition-all"
-                  >
-                    <div className="flex gap-4">
-                      <div className="bg-blue-600 text-white size-9 sm:size-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm sm:text-base">
-                        {index + 1}
-                      </div>
+                                <div
+                                    key={index}
+                                    className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 sm:p-6 rounded-lg border-2 border-blue-200 hover:shadow-lg transition-all"
+                                >
+                                    <div className="flex gap-4">
+                                        <div className="bg-blue-600 text-white size-9 sm:size-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm sm:text-base">
+                                            {index + 1}
+                                        </div>
                       <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
                         {objective}
                       </p>
-                    </div>
-                  </div>
+                                    </div>
+                                </div>
                 ),
               )}
-            </div>
-          </div>
-        </div>
-      </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-      {/* Learning Outcomes */}
-      <section className="py-12 sm:py-16 bg-gray-50">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
+            {/* Learning Outcomes */}
+            <section className="py-12 sm:py-16 bg-gray-50">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
           {isAdmin ? (
             <div className="flex justify-end mb-6">
               <button
@@ -877,41 +877,41 @@ export default function DetailPageComp({
               </button>
             </div>
           ) : null}
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10 sm:mb-12">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-10 sm:mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#254151] mb-3 sm:mb-4">
                 {t("outcomesTitle")}
               </h2>
-              <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto mb-3 sm:mb-4" />
+                            <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto mb-3 sm:mb-4" />
               <p className="text-sm sm:text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
                 {t("outcomesSubtitle")}
               </p>
-            </div>
+                        </div>
 
-            <div className="space-y-3 sm:space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
               {(isRtl ? learningOutcomes.ar : learningOutcomes.en).map(
                 (outcome, index) => (
-                  <div
-                    key={index}
-                    className="bg-white p-5 sm:p-6 rounded-lg shadow-md border-r-4 border-green-500 hover:shadow-xl transition-all"
-                  >
-                    <div className="flex gap-4">
-                      <CheckCircle className="size-5 sm:size-6 text-green-600 flex-shrink-0 mt-1" />
+                                <div
+                                    key={index}
+                                    className="bg-white p-5 sm:p-6 rounded-lg shadow-md border-r-4 border-green-500 hover:shadow-xl transition-all"
+                                >
+                                    <div className="flex gap-4">
+                                        <CheckCircle className="size-5 sm:size-6 text-green-600 flex-shrink-0 mt-1" />
                       <p className="text-gray-700 text-sm sm:text-base lg:text-lg leading-relaxed">
                         {outcome}
                       </p>
-                    </div>
-                  </div>
+                                    </div>
+                                </div>
                 ),
               )}
-            </div>
-          </div>
-        </div>
-      </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-      {/* Study Plan */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
+            {/* Study Plan */}
+            <section className="py-12 sm:py-16 bg-white">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
           {isAdmin ? (
             <div className="flex justify-end mb-6">
               <button
@@ -924,98 +924,98 @@ export default function DetailPageComp({
               </button>
             </div>
           ) : null}
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-10 sm:mb-12">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="text-center mb-10 sm:mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#254151] mb-3 sm:mb-4">
                 {t("requirementsTitle")}
               </h2>
-              <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto" />
-            </div>
+                            <div className="w-16 sm:w-24 h-1 bg-[#c2a772] mx-auto" />
+                        </div>
 
-            {/* Tabs */}
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-              <button
-                type="button"
+                        {/* Tabs */}
+                        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                            <button
+                                type="button"
                 onClick={() => setActiveTab("public")}
                 className={`px-5 sm:px-8 py-3 sm:py-4 rounded-lg font-bold transition-all text-sm sm:text-base lg:text-lg ${
                   activeTab === "public"
                     ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {t("tabPublic")}
-              </button>
-              <button
-                type="button"
+                                    }`}
+                            >
+                                {t("tabPublic")}
+                            </button>
+                            <button
+                                type="button"
                 onClick={() => setActiveTab("private")}
                 className={`px-5 sm:px-8 py-3 sm:py-4 rounded-lg font-bold transition-all text-sm sm:text-base lg:text-lg ${
                   activeTab === "private"
                     ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {t("tabPrivate")}
-              </button>
-            </div>
+                                    }`}
+                            >
+                                {t("tabPrivate")}
+                            </button>
+                        </div>
 
-            <CourseTable
-              index={1}
-              accent="blue"
-              title={t("section1Title")}
-              isRtl={isRtl}
-              courses={currentCourses.core}
+                        <CourseTable
+                            index={1}
+                            accent="blue"
+                            title={t("section1Title")}
+                            isRtl={isRtl}
+                            courses={currentCourses.core}
               headers={{
                 seq: t("thSeq"),
                 code: t("thCode"),
                 title: t("thTitle"),
                 credits: t("thCredits"),
               }}
-            />
+                        />
 
-            <CourseTable
-              index={2}
-              accent="green"
-              title={t("section2Title")}
-              isRtl={isRtl}
-              courses={currentCourses.major}
+                        <CourseTable
+                            index={2}
+                            accent="green"
+                            title={t("section2Title")}
+                            isRtl={isRtl}
+                            courses={currentCourses.major}
               headers={{
                 seq: t("thSeq"),
                 code: t("thCode"),
                 title: t("thTitle"),
                 credits: t("thCredits"),
               }}
-            />
+                        />
 
-            <CourseTable
-              index={3}
-              accent="purple"
-              title={t("section3Title")}
-              isRtl={isRtl}
-              courses={currentCourses.elective}
+                        <CourseTable
+                            index={3}
+                            accent="purple"
+                            title={t("section3Title")}
+                            isRtl={isRtl}
+                            courses={currentCourses.elective}
               headers={{
                 seq: t("thSeq"),
                 code: t("thCode"),
                 title: t("thTitle"),
                 credits: t("thCredits"),
               }}
-            />
+                        />
 
-            <CourseTable
-              index={4}
-              accent="red"
-              title={t("section4Title")}
-              isRtl={isRtl}
-              courses={currentCourses.thesis}
+                        <CourseTable
+                            index={4}
+                            accent="red"
+                            title={t("section4Title")}
+                            isRtl={isRtl}
+                            courses={currentCourses.thesis}
               headers={{
                 seq: t("thSeq"),
                 code: t("thCode"),
                 title: t("thTitle"),
                 credits: t("thCredits"),
               }}
-            />
-          </div>
-        </div>
-      </section>
+                        />
+                    </div>
+                </div>
+            </section>
 
       {isAdmin && editorOpen && editorSection ? (
         <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 overflow-y-auto">
@@ -1031,7 +1031,7 @@ export default function DetailPageComp({
                 <div>
                   <div className="font-semibold text-[#254151]">
                     {t("editorEdit")} {editorSectionTitle}
-                  </div>
+        </div>
                   <div className="text-xs text-muted-foreground">
                     {t("editorUpdateSubtitle")}
                   </div>

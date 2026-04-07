@@ -25,17 +25,19 @@ export async function POST(request: Request) {
             name?: string;
             role?: string;
             description?: string;
+            image?: string;
         };
 
         const name = (body.name || '').trim();
         const role = (body.role || '').trim();
         const description = typeof body.description === 'string' ? body.description.trim() : '';
+        const image = typeof body.image === 'string' ? body.image.trim() : '';
 
         if (!name || !role) {
             return NextResponse.json({ ok: false, message: 'Missing name or role' }, { status: 400 });
         }
 
-        const created = await CollegeCouncilMember.create({ name, role, description });
+        const created = await CollegeCouncilMember.create({ name, role, description, image });
 
         return NextResponse.json({ ok: true, data: created }, { status: 201 });
     } catch (e) {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState, type ComponentType } from "react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ type NavItem = {
 export default function SideBar() {
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
+    const tCouncil = useTranslations("dashboardCouncil");
 
     const navItems = useMemo<NavItem[]>(
         () => [
@@ -25,7 +27,7 @@ export default function SideBar() {
             { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
             // { title: "Users", href: "/dashboard/users", icon: Users },
             // { title: "Settings", href: "/dashboard/settings", icon: Settings },
-            { title: "council", href: "/dashboard/council", icon: Landmark },
+            { title: tCouncil("sidebarNav"), href: "/dashboard/council", icon: Landmark },
             { title: "messages", href: "/dashboard/messages", icon: Mail },
             { title: "partners", href: "/dashboard/partners", icon: Handshake },
             { title: "departments", href: "/dashboard/departments", icon: BookOpen },
@@ -34,7 +36,7 @@ export default function SideBar() {
             { title: "careers", href: "/dashboard/careers", icon: Package },
             { title: "contact", href: "/dashboard/contact", icon: Contact2 },
         ],
-        []
+        [tCouncil],
     );
 
     return (

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronRight, Home } from "lucide-react";
 
 type Crumb = {
@@ -19,19 +20,21 @@ function titleCase(input: string) {
         .join(" ");
 }
 
-const LABELS: Record<string, string> = {
-    dashboard: "Dashboard",
-    council: "Council",
-    "board-trustees": "Board Trustees",
-    "board-directors": "Board Directors",
-    "advisory-council": "Advisory Council",
-    "college-council": "College Council",
-    new: "New",
-    "graduate-programs": "Graduate programs",
+/** next-intl keys under `dashboardCouncil` */
+const SEG_TRANSLATION_KEY: Record<string, string> = {
+    dashboard: "crumbDashboard",
+    council: "hubTitle",
+    "board-trustees": "trusteesTitle",
+    "board-directors": "directorsTitle",
+    "advisory-council": "advisoryTitle",
+    "college-council": "collegeTitle",
+    new: "crumbNew",
+    "graduate-programs": "crumbGraduatePrograms",
 };
 
 export default function Breadcrumbs() {
     const pathname = usePathname() || "/";
+    const t = useTranslations("dashboardCouncil");
 
     const crumbs = useMemo<Crumb[]>(() => {
         const cleanPath = pathname.split("?")[0].split("#")[0];
@@ -48,7 +51,12 @@ export default function Breadcrumbs() {
             acc += `/${seg}`;
             const isLast = idx === dashSegments.length - 1;
 
-            const label = LABELS[seg] ?? (seg.length >= 20 ? "Details" : titleCase(seg));
+            const msgKey = SEG_TRANSLATION_KEY[seg];
+            const label = msgKey
+                ? t(msgKey as Parameters<typeof t>[0])
+                : seg.length >= 20
+                  ? "…"
+                  : titleCase(seg);
 
             items.push({
                 label,
@@ -58,7 +66,7 @@ export default function Breadcrumbs() {
         });
 
         return items;
-    }, [pathname]);
+    }, [pathname, t]);
 
     if (crumbs.length === 0) return null;
 
