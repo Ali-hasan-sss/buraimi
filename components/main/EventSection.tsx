@@ -1,14 +1,15 @@
 "use client"
 import { ChevronLeft, ChevronRight, ArrowLeft, ArrowRight } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
-import { events } from '@/staticData/landing';
 import Link from 'next/link';
+import type { EventItemFromAPI } from '@/types/event';
 
 export function EventsSection() {
     const [activeTab, setActiveTab] = useState<'events' | 'conferences' | 'student'>('events');
     const [upcomingPage, setUpcomingPage] = useState(0);
     const [pastPage, setPastPage] = useState(0);
+    const [events, setEvents] = useState<EventItemFromAPI[]>([]);
 
     const locale = useLocale();
     const isRTL = locale === 'ar';
@@ -16,8 +17,40 @@ export function EventsSection() {
 
     const PAGE_SIZE = 3;
 
-    const upcomingEvents = useMemo(() => events.filter((e) => e.category === 'upcoming'), []);
-    const pastEvents = useMemo(() => events.filter((e) => e.category === 'past'), []);
+    useEffect(() => {
+        async function loadEvents() {
+            try {
+                const res = await fetch('/api/events', { cache: 'no-store' });
+                const json = await res.json() as { ok: boolean; data?: EventItemFromAPI[] };
+                if (json.ok && Array.isArray(json.data)) {
+                    setEvents(json.data);
+                }
+            } catch {
+                setEvents([]);
+            }
+        }
+        void loadEvents();
+    }, []);
+
+    useEffect(() => {
+        setUpcomingPage(0);
+        setPastPage(0);
+    }, [activeTab]);
+
+    const now = useMemo(() => new Date(), []);
+    const filteredByTab = useMemo(
+        () => events.filter((e) => e.type === activeTab),
+        [events, activeTab]
+    );
+    const upcomingEvents = useMemo(
+        () => filteredByTab.filter((e) => new Date(e.date) >= now),
+        [filteredByTab, now]
+    );
+    const pastEvents = useMemo(
+        () => filteredByTab.filter((e) => new Date(e.date) < now),
+        [filteredByTab, now]
+    );
+    const featuredEvent = upcomingEvents[0] || pastEvents[0];
 
     const upcomingMaxPage = Math.max(0, Math.ceil(upcomingEvents.length / PAGE_SIZE) - 1);
     const pastMaxPage = Math.max(0, Math.ceil(pastEvents.length / PAGE_SIZE) - 1);
@@ -164,16 +197,24 @@ export function EventsSection() {
                                     {/* Featured Event Card */}
                                     <div className="bg-[#182a32] rounded-xl p-6">
                                         <div className="mb-4">
-                                            <div className="text-xs text-white/70 mb-1">{t.calendar.featuredDate}</div>
+                                            <div className="text-xs text-white/70 mb-1">
+                                                {featuredEvent
+                                                    ? new Date(featuredEvent.date).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')
+                                                    : t.calendar.featuredDate}
+                                            </div>
                                             <div className="flex items-start gap-2">
                                                 <div className="size-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                                <div className="text-sm text-white/90">{t.calendar.featuredKicker}</div>
+                                                <div className="text-sm text-white/90">
+                                                    {featuredEvent
+                                                        ? (isRTL ? featuredEvent.locationAr : featuredEvent.locationEn)
+                                                        : t.calendar.featuredKicker}
+                                                </div>
                                             </div>
                                         </div>
                                         <h3 className={`text-base leading-relaxed mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>
-                                            {t.calendar.featuredTitle}
+                                            {featuredEvent ? (isRTL ? featuredEvent.titleAr : featuredEvent.titleEn) : t.calendar.featuredTitle}
                                         </h3>
-                                        <Link href="/main/news" className="w-full bg-[#6096b4] hover:bg-[#4e7d99] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+                                        <Link href={featuredEvent ? `/main/events/${featuredEvent.slug}` : "/main"} className="w-full bg-[#6096b4] hover:bg-[#4e7d99] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2">
                                             {isRTL ? <ArrowLeft className="size-4" /> : <ArrowRight className="size-4" />}
                                             <span>{t.calendar.readMore}</span>
                                         </Link >
@@ -211,21 +252,21 @@ export function EventsSection() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {upcomingVisible.map((event) => (
                                         <div
-                                            key={event.id}
+                                            key={event._id}
                                             className="bg-gray-100/50 rounded-xl hover:bg-[#6193ad] transition-all duration-300 overflow-hidden group cursor-pointer relative p-6 min-h-[220px] flex flex-col"
                                         >
-                                            <div className={`text-sm text-gray-600 group-hover:text-white mb-4 ${isRTL ? 'text-right' : 'text-left'} transition-colors`}>{event.date}</div>
+                                            <div className={`text-sm text-gray-600 group-hover:text-white mb-4 ${isRTL ? 'text-right' : 'text-left'} transition-colors`}>{new Date(event.date).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</div>
                                             <h3 className={`text-lg text-[#254151] group-hover:text-white leading-relaxed ${isRTL ? 'text-right' : 'text-left'} flex-1 mb-12 transition-colors`}>
                                                 {isRTL ? event.titleAr : event.titleEn}
                                             </h3>
                                             <div className="absolute bottom-6 left-6">
-                                                <button className="size-12 bg-[#6096b4] group-hover:bg-white rounded-full flex items-center justify-center transition-all group-hover:scale-110">
+                                                <Link href={`/main/events/${event.slug}`} className="size-12 bg-[#6096b4] group-hover:bg-white rounded-full flex items-center justify-center transition-all group-hover:scale-110">
                                                     {isRTL ? (
                                                         <ArrowLeft className="size-5 text-white group-hover:text-[#6193ad] transition-colors" />
                                                     ) : (
                                                         <ArrowRight className="size-5 text-white group-hover:text-[#6193ad] transition-colors" />
                                                     )}
-                                                </button>
+                                                </Link>
                                             </div>
                                         </div>
                                     ))}
@@ -259,21 +300,21 @@ export function EventsSection() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {pastVisible.map((event) => (
                                         <div
-                                            key={event.id}
+                                            key={event._id}
                                             className="bg-gray-100/50 rounded-xl hover:bg-[#6193ad] transition-all duration-300 overflow-hidden group cursor-pointer relative p-6 min-h-[220px] flex flex-col"
                                         >
-                                            <div className={`text-sm text-gray-600 group-hover:text-white mb-4 ${isRTL ? 'text-right' : 'text-left'} transition-colors`}>{event.date}</div>
+                                            <div className={`text-sm text-gray-600 group-hover:text-white mb-4 ${isRTL ? 'text-right' : 'text-left'} transition-colors`}>{new Date(event.date).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</div>
                                             <h3 className={`text-lg text-[#254151] group-hover:text-white leading-relaxed ${isRTL ? 'text-right' : 'text-left'} flex-1 mb-12 transition-colors`}>
                                                 {isRTL ? event.titleAr : event.titleEn}
                                             </h3>
                                             <div className={`absolute bottom-6 ${isRTL ? 'left-6' : 'right-6'}`}>
-                                                <button className="size-12 bg-[#6096b4] group-hover:bg-white rounded-full flex items-center justify-center transition-all group-hover:scale-110">
+                                                <Link href={`/main/events/${event.slug}`} className="size-12 bg-[#6096b4] group-hover:bg-white rounded-full flex items-center justify-center transition-all group-hover:scale-110">
                                                     {isRTL ? (
                                                         <ArrowLeft className="size-5 text-white group-hover:text-[#6193ad] transition-colors" />
                                                     ) : (
                                                         <ArrowRight className="size-5 text-white group-hover:text-[#6193ad] transition-colors" />
                                                     )}
-                                                </button>
+                                                </Link>
                                             </div>
                                         </div>
                                     ))}

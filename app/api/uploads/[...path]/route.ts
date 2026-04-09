@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const EXT_RE = /\.(jpe?g|png|gif|webp)$/i;
+const EXT_RE = /\.(jpe?g|png|gif|webp|pdf|txt|md|csv|rtf|doc|docx)$/i;
 
 function isSafeSegment(seg: string): boolean {
     if (!seg || seg === "." || seg === "..") return false;
@@ -54,7 +54,21 @@ export async function GET(
                   ? "image/webp"
                   : ext === ".gif"
                     ? "image/gif"
-                    : "image/jpeg";
+                    : ext === ".pdf"
+                      ? "application/pdf"
+                      : ext === ".txt"
+                        ? "text/plain; charset=utf-8"
+                        : ext === ".md"
+                          ? "text/markdown; charset=utf-8"
+                          : ext === ".csv"
+                            ? "text/csv; charset=utf-8"
+                            : ext === ".rtf"
+                              ? "application/rtf"
+                              : ext === ".doc"
+                                ? "application/msword"
+                                : ext === ".docx"
+                                  ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                  : "image/jpeg";
         return new NextResponse(buf, {
             headers: {
                 "Content-Type": contentType,

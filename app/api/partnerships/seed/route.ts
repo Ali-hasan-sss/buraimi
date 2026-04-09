@@ -293,6 +293,7 @@ async function seed() {
                         order: p.partnerId,
                         name: p.name,
                         nameEn: p.nameEn,
+                            logo: `/assets/landing/partners/partner-${((p.partnerId - 1) % 16) + 1}.webp`,
                         type: p.type,
                         description: p.description,
                         date: p.date,

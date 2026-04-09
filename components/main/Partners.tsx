@@ -2,18 +2,37 @@
 import { useEffect, useRef, useState } from 'react';
 import partnersImage from '@/public/assets/fba3bfdda91dec393b4c95ad988d5d5c28a212e2.png';
 import Image from 'next/image';
-import { partnersData } from '@/staticData/landing';
 import { useTranslations } from 'next-intl';
+import { resolveUploadImageSrc } from '@/lib/upload-public-url';
 
-const partners = partnersData
+type PartnerLogoItem = {
+    _id?: string;
+    name?: string;
+    logo?: string;
+    link?: string;
+};
 
-export function Partners() {
+function toExternalUrl(url: string): string {
+    const value = url.trim();
+    if (!value) return "";
+    if (value.startsWith("http://") || value.startsWith("https://")) return value;
+    return `https://${value}`;
+}
+
+export function Partners({ partners = [] }: { partners?: PartnerLogoItem[] }) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isPaused, setIsPaused] = useState(false);
+    const normalizedPartners = partners
+        .filter((p) => (p.logo || "").trim() !== "")
+        .map((p) => ({
+            name: p.name || "partner",
+            image: resolveUploadImageSrc((p.logo || "").trim()),
+            link: (p.link || "").trim(),
+        }));
 
 
     // Duplicate partners for infinite scroll effect
-    const duplicatedPartners = [...partners, ...partners, ...partners];
+    const duplicatedPartners = [...normalizedPartners, ...normalizedPartners, ...normalizedPartners];
 
     useEffect(() => {
         const scrollContainer = scrollRef.current;
@@ -38,7 +57,8 @@ export function Partners() {
 
                 // Reset position when we've scrolled through one set of partners
                 const itemWidth = getItemWidth();
-                const resetPoint = partners.length * itemWidth;
+                const resetPoint = normalizedPartners.length * itemWidth;
+                if (resetPoint <= 0) return;
 
                 if (scrollPosition >= resetPoint) {
                     scrollPosition = 0;
@@ -60,7 +80,7 @@ export function Partners() {
                 cancelAnimationFrame(animationId);
             }
         };
-    }, [isPaused]);
+    }, [isPaused, normalizedPartners.length]);
 
 
     const tPartner = useTranslations("partners")
@@ -114,22 +134,50 @@ export function Partners() {
 
                             }}
                         >
-                            {duplicatedPartners.map((partner, index) => (
-                                <div
-                                    key={`${index}`}
-                                    className="flex items-center justify-center grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300 cursor-pointer flex-shrink-0 w-[120px] h-[56px] sm:w-[150px] sm:h-[70px] lg:w-[180px] lg:h-[80px]"
-                                >
-                                    <Image
-                                        width={100}
-                                        height={75}
-                                        src={partner.image}
-                                        alt={"partner"}
-                                        sizes="(min-width: 1024px) 180px, (min-width: 640px) 150px, 120px"
-                                        className="max-w-full max-h-full object-contain"
-                                        loading="lazy"
-                                    />
+                            {duplicatedPartners.length > 0 ? (
+                                duplicatedPartners.map((partner, index) => {
+                                    const href = toExternalUrl(partner.link || "");
+                                    const content = (
+                                        <Image
+                                            width={100}
+                                            height={75}
+                                            src={partner.image}
+                                            alt={partner.name || "partner"}
+                                            sizes="(min-width: 1024px) 180px, (min-width: 640px) 150px, 120px"
+                                            className="max-w-full max-h-full object-contain"
+                                            loading="lazy"
+                                        />
+                                    );
+
+                                    if (!href) {
+                                        return (
+                                            <div
+                                                key={`${index}`}
+                                                className="flex items-center justify-center grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300 cursor-pointer flex-shrink-0 w-[120px] h-[56px] sm:w-[150px] sm:h-[70px] lg:w-[180px] lg:h-[80px]"
+                                            >
+                                                {content}
+                                            </div>
+                                        );
+                                    }
+
+                                    return (
+                                        <a
+                                            key={`${index}`}
+                                            href={href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label={partner.name || "partner"}
+                                            className="flex items-center justify-center grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300 cursor-pointer flex-shrink-0 w-[120px] h-[56px] sm:w-[150px] sm:h-[70px] lg:w-[180px] lg:h-[80px]"
+                                        >
+                                            {content}
+                                        </a>
+                                    );
+                                })
+                            ) : (
+                                <div className="w-full text-center text-sm text-gray-500 py-4">
+                                    لا توجد شعارات شركاء مضافة حالياً
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 "use client"
-import { Briefcase, GraduationCap, Users } from "lucide-react";
+import { Briefcase, GraduationCap, Pencil, Users } from "lucide-react";
+import Link from "next/link";
 
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react";
@@ -20,6 +21,7 @@ export default function CollegeCouncilContent() {
     const [member, setMember] = useState<CollegeCouncil[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -57,6 +59,23 @@ export default function CollegeCouncilContent() {
         };
     }, [])
 
+    useEffect(() => {
+        async function checkAdmin() {
+            try {
+                const res = await fetch("/api/auth/me", {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
+                });
+                const json = (await res.json()) as { ok: boolean; isAdmin?: boolean };
+                setIsAdmin(Boolean(json.ok && json.isAdmin));
+            } catch {
+                setIsAdmin(false);
+            }
+        }
+        void checkAdmin();
+    }, []);
+
     const headeMember = member.filter((m) => m.role !== 'عضو' && m.role !== 'industry')
     const academicMembers = member.filter((m) => m.role === 'عضو')
     const industryMembers = member.filter((m) => m.role === 'industry')
@@ -77,6 +96,15 @@ export default function CollegeCouncilContent() {
                         مجلس الكلية
                     </h2>
                 </div>
+                {isAdmin && (
+                    <Link
+                        href="/dashboard/council/college-council"
+                        className="ms-auto inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                    >
+                        <Pencil className="size-4" />
+                        إدارة المجلس
+                    </Link>
+                )}
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">

@@ -1,35 +1,67 @@
-"use client"
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import motifPattern from '@/public/assets/f0d44e951856d5acf36cd6bce8a291e7e6cd0b62.png';
-import { StatsData } from '@/staticData/landing';
+import React, { useEffect, useRef, useState } from "react";
+import motifPattern from "@/public/assets/f0d44e951856d5acf36cd6bce8a291e7e6cd0b62.png";
 import { useLocale } from "next-intl";
+import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
 
-interface StatCard {
-    value: string;
-    label: string;
-    subLabel?: string;
-    numericValue: number;
+interface FactStat {
+    _id?: string;
+    titleAr: string;
+    titleEn: string;
+    value: number;
+    suffixAr: string;
+    suffixEn: string;
+    order: number;
 }
 
-const stats: StatCard[] = StatsData
-
 export function FactsAndStats() {
-
-    const locale = useLocale()
-    const isAr = locale === "ar"
-    const localeKey: "ar" | "en" = isAr ? "ar" : "en"
+    const locale = useLocale();
+    const isAr = locale === "ar";
 
     const sectionRef = useRef<HTMLDivElement>(null);
     const rafIdRef = useRef<number | null>(null);
     const hasAnimatedRef = useRef(false);
 
-    const [counters, setCounters] = useState<number[]>(() => stats.map(() => 0))
+    const [stats, setStats] = useState<FactStat[]>([]);
+    const [draftStats, setDraftStats] = useState<FactStat[]>([]);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [counters, setCounters] = useState<number[]>([]);
+
+    const viewStats = isEditing ? draftStats : stats;
+
+    const loadData = React.useCallback(async () => {
+        try {
+            const [statsRes, meRes] = await Promise.all([
+                fetch("/api/fact-stats", { method: "GET", cache: "no-store" }),
+                fetch("/api/auth/me", { method: "GET", credentials: "include", cache: "no-store" }),
+            ]);
+
+            const statsJson = (await statsRes.json()) as { ok: boolean; data?: FactStat[] };
+            const meJson = (await meRes.json()) as { ok: boolean; isAdmin?: boolean };
+
+            if (statsJson.ok && Array.isArray(statsJson.data)) {
+                const ordered = [...statsJson.data].sort((a, b) => a.order - b.order);
+                setStats(ordered);
+                setCounters(ordered.map(() => 0));
+                hasAnimatedRef.current = false;
+            }
+
+            setIsAdmin(Boolean(meJson.ok && meJson.isAdmin));
+        } catch {
+            setIsAdmin(false);
+            setStats([]);
+        }
+    }, []);
 
     const animateCounters = React.useCallback(() => {
+        if (!stats.length) return;
+
         const durationMs = 1600;
         const start = performance.now();
-        const targets = stats.map((s) => s.numericValue);
+        const targets = stats.map((s) => s.value);
 
         if (rafIdRef.current) {
             cancelAnimationFrame(rafIdRef.current);
@@ -53,23 +85,28 @@ export function FactsAndStats() {
         };
 
         rafIdRef.current = requestAnimationFrame(tick);
-    }, []);
+    }, [stats]);
+
+    useEffect(() => {
+        void loadData();
+    }, [loadData]);
 
     useEffect(() => {
         const el = sectionRef.current;
-        if (!el) return;
+        if (!el || !stats.length || isEditing) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
                 const entry = entries[0];
                 if (!entry) return;
+
                 if (entry.isIntersecting && !hasAnimatedRef.current) {
                     hasAnimatedRef.current = true;
                     animateCounters();
                     observer.disconnect();
                 }
             },
-            { threshold: 0.3 }
+            { threshold: 0.3 },
         );
 
         observer.observe(el);
@@ -81,101 +118,281 @@ export function FactsAndStats() {
                 rafIdRef.current = null;
             }
         };
-    }, [animateCounters]);
+    }, [animateCounters, isEditing, stats.length]);
 
-    const formatNumber = (num: number, originalFormat: string) => {
-        // If original has comma, add it back
-        if (originalFormat.includes(',')) {
-            return num.toLocaleString('en-US');
-        }
-        return num.toString();
+    const formatNumber = (num: number) => num.toLocaleString("en-US");
+
+    const onEditStart = () => {
+        setDraftStats(stats.map((item) => ({ ...item })));
+        setIsEditing(true);
     };
 
-    const localizedStats = React.useMemo(() => {
-        const labelsByLocale: Record<"ar" | "en", Array<{ label: string; subLabel?: string }>> = {
-            ar: [
-                { label: "دراسات عليا", subLabel: "الطلاب" },
-                { label: "خريج", subLabel: "الطلاب" },
-                { label: "خبرتنا", subLabel: "سنة" },
-            ],
-            en: [
-                { label: "Graduate Studies", subLabel: "Students" },
-                { label: "Graduates", subLabel: "Students" },
-                { label: "Our Experience", subLabel: "Years" },
-            ],
+    const onEditCancel = () => {
+        setDraftStats([]);
+        setIsEditing(false);
+    };
+
+    const updateDraftAt = (index: number, patch: Partial<FactStat>) => {
+        setDraftStats((prev) =>
+            prev.map((item, i) => (i === index ? { ...item, ...patch } : item)),
+        );
+    };
+
+    const addNewStat = () => {
+        setDraftStats((prev) => [
+            ...prev,
+            {
+                titleAr: "احصائية جديدة",
+                titleEn: "New Statistic",
+                value: 0,
+                suffixAr: "",
+                suffixEn: "",
+                order: prev.length,
+            },
+        ]);
+    };
+
+    const removeStat = (index: number) => {
+        setDraftStats((prev) =>
+            prev
+                .filter((_, i) => i !== index)
+                .map((item, i) => ({ ...item, order: i })),
+        );
+    };
+
+    const saveChanges = async () => {
+        const cleaned = draftStats.map((item, i) => ({
+            ...item,
+            titleAr: item.titleAr.trim(),
+            titleEn: item.titleEn.trim(),
+            suffixAr: item.suffixAr.trim(),
+            suffixEn: item.suffixEn.trim(),
+            value: Number(item.value) || 0,
+            order: i,
+        }));
+
+        if (cleaned.some((item) => !item.titleAr || !item.titleEn || item.value < 0)) {
+            return;
         }
 
-        return stats.map((s, index) => {
-            const localized = labelsByLocale[localeKey][index]
-            return {
-                ...s,
-                label: localized?.label ?? s.label,
-                subLabel: localized?.subLabel ?? s.subLabel,
-            }
-        })
-    }, [localeKey])
+        setSaving(true);
+        try {
+            const existingIds = new Set(stats.filter((s) => s._id).map((s) => String(s._id)));
+            const draftIds = new Set(cleaned.filter((s) => s._id).map((s) => String(s._id)));
 
-    const titleText = isAr ? "الحقائق و الأرقام" : "Facts & Numbers"
+            const removedIds = [...existingIds].filter((id) => !draftIds.has(id));
+            for (const id of removedIds) {
+                await fetch(`/api/fact-stats/${id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+            }
+
+            for (const item of cleaned) {
+                if (item._id) {
+                    await fetch(`/api/fact-stats/${item._id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify(item),
+                    });
+                } else {
+                    await fetch("/api/fact-stats", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify(item),
+                    });
+                }
+            }
+
+            await loadData();
+            setIsEditing(false);
+            setDraftStats([]);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const titleText = isAr ? "الحقائق و الأرقام" : "Facts & Numbers";
 
     return (
         <>
-            {/* Title Section */}
             <div className="bg-gradient-to-b from-gray-50 to-white relative py-6">
-
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 relative z-10">
-                    <h2 className={`text-base sm:text-lg xl:text-2xl 2xl:text-[51px] font-black text-[#254151] ${isAr ? "text-right" : "text-left"} mb-0`} style={{ fontFamily: 'Cairo', fontWeight: 900, letterSpacing: '-0.02em' }}>
-                        {titleText}
-                    </h2>
+                    <div
+                        className={`flex items-center gap-3 ${isAr ? "justify-between flex-row-reverse" : "justify-between"}`}
+                    >
+                        <h2
+                            className={`text-base sm:text-lg xl:text-2xl 2xl:text-[51px] font-black text-[#254151] ${isAr ? "text-right" : "text-left"} mb-0`}
+                            style={{ fontFamily: "Cairo", fontWeight: 900, letterSpacing: "-0.02em" }}
+                        >
+                            {titleText}
+                        </h2>
+                        {isAdmin &&
+                            (!isEditing ? (
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                                    onClick={onEditStart}
+                                >
+                                    <Pencil className="size-4" />
+                                    {isAr ? "تعديل القسم" : "Edit Section"}
+                                </button>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-lg disabled:opacity-60"
+                                        onClick={saveChanges}
+                                        disabled={saving}
+                                    >
+                                        <Save className="size-4" />
+                                        {saving
+                                            ? isAr
+                                                ? "جاري الحفظ..."
+                                                : "Saving..."
+                                            : isAr
+                                              ? "حفظ"
+                                              : "Save"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="inline-flex items-center gap-2 rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                                        onClick={onEditCancel}
+                                    >
+                                        <X className="size-4" />
+                                        {isAr ? "إلغاء" : "Cancel"}
+                                    </button>
+                                </div>
+                            ))}
+                    </div>
                 </div>
             </div>
 
-            {/* Stats Section */}
             <section
                 ref={sectionRef}
                 className="relative py-8 bg-gradient-to-r from-[#254151] via-[#6096b4] to-[#254151] shadow-lg overflow-hidden"
             >
-                {/* Animated Motif Pattern */}
                 <div
                     className="absolute inset-0 pointer-events-none motif-scroll-bg opacity-35"
                     style={{
                         backgroundImage: `url(${motifPattern.src})`,
-                        backgroundRepeat: 'repeat-x',
-                        backgroundSize: 'auto 100%',
-                        backgroundPosition: 'right center',
+                        backgroundRepeat: "repeat-x",
+                        backgroundSize: "auto 100%",
+                        backgroundPosition: "right center",
                         zIndex: 1,
-                        mixBlendMode: 'soft-light'
+                        mixBlendMode: "soft-light",
                     }}
                 />
 
-                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16" style={{ position: 'relative', zIndex: 3 }}>
-                    <div className="grid  lg:grid-cols-3 sm:grid-cols-1 grid-cols-1 gap-6 md:gap-8">
-                        {localizedStats.map((stat, index) => (
-                            <div
-                                key={`${index}`}
-                                className="grid grid-cols-1 sm:flex items-center gap-4 justify-center "
+                <div
+                    className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16"
+                    style={{ position: "relative", zIndex: 3 }}
+                >
+                    {isAdmin && isEditing && (
+                        <div className="mb-6 flex justify-end">
+                            <button
+                                type="button"
+                                className="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
+                                onClick={addNewStat}
                             >
+                                <Plus className="size-4" />
+                                {isAr ? "إضافة إحصائية" : "Add Statistic"}
+                            </button>
+                        </div>
+                    )}
 
-                                {/* Content */}
+                    <div className="grid lg:grid-cols-3 sm:grid-cols-1 grid-cols-1 gap-6 md:gap-8">
+                        {viewStats.map((stat, index) => (
+                            <div
+                                key={stat._id || `new-${index}`}
+                                className="relative grid grid-cols-1 sm:flex items-center gap-4 justify-center"
+                            >
+                                {isAdmin && isEditing && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeStat(index)}
+                                        className="absolute -top-3 -right-3 z-10 flex size-8 items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700"
+                                        aria-label={isAr ? "حذف الإحصائية" : "Delete statistic"}
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </button>
+                                )}
+
                                 <div className="flex flex-col">
-                                    <div className="text-white/90 font-semibold text-base md:text-xl">
-                                        {stat.label}
-                                    </div>
-                                    <div className='flex gap-2 items-center '>
-                                        <div className="md:text-lg xl:text-xl 2xl:text-[41px] font-bold text-white transition-all duration-300">
-                                            {formatNumber(counters[index], stat.value)}
+                                    {isAdmin && isEditing ? (
+                                        <div className="grid gap-2">
+                                            <input
+                                                type="text"
+                                                value={stat.titleAr}
+                                                onChange={(e) => updateDraftAt(index, { titleAr: e.target.value })}
+                                                className="rounded-md border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60"
+                                                placeholder="العنوان بالعربي"
+                                                dir="rtl"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={stat.titleEn}
+                                                onChange={(e) => updateDraftAt(index, { titleEn: e.target.value })}
+                                                className="rounded-md border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60"
+                                                placeholder="Title in English"
+                                                dir="ltr"
+                                            />
                                         </div>
-                                        {stat.subLabel && (
-                                            <div className="text-white/70 text-xs md:text-sm">
-                                                {stat.subLabel}
-                                            </div>
-                                        )}
+                                    ) : (
+                                        <div className="text-white/90 font-semibold text-base md:text-xl">
+                                            {isAr ? stat.titleAr : stat.titleEn}
+                                        </div>
+                                    )}
 
+                                    <div className="flex gap-2 items-center">
+                                        {isAdmin && isEditing ? (
+                                            <div className="grid w-full gap-2">
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    value={stat.value}
+                                                    onChange={(e) =>
+                                                        updateDraftAt(index, { value: Number(e.target.value) })
+                                                    }
+                                                    className="rounded-md border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60"
+                                                    placeholder={isAr ? "الرقم" : "Number"}
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={stat.suffixAr}
+                                                    onChange={(e) => updateDraftAt(index, { suffixAr: e.target.value })}
+                                                    className="rounded-md border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60"
+                                                    placeholder="لاحقة الرقم بالعربي"
+                                                    dir="rtl"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={stat.suffixEn}
+                                                    onChange={(e) => updateDraftAt(index, { suffixEn: e.target.value })}
+                                                    className="rounded-md border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60"
+                                                    placeholder="Number suffix in English"
+                                                    dir="ltr"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="md:text-lg xl:text-xl 2xl:text-[41px] font-bold text-white transition-all duration-300">
+                                                    {formatNumber(counters[index] ?? 0)}
+                                                </div>
+                                                {(isAr ? stat.suffixAr : stat.suffixEn) && (
+                                                    <div className="text-white/70 text-xs md:text-sm">
+                                                        {isAr ? stat.suffixAr : stat.suffixEn}
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
-                                {/* Separator - hidden on last item */}
-                                {index < stats.length - 1 && (
-                                    <div className="hidden md:block w-px h-16 bg-white/20 absolute left-full"></div>
+                                {index < viewStats.length - 1 && (
+                                    <div className="hidden md:block w-px h-16 bg-white/20 absolute left-full" />
                                 )}
                             </div>
                         ))}

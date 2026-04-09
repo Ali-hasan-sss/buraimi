@@ -1,6 +1,7 @@
 "use client"
-import { useEffect } from "react";
-import { GraduationCap, Shield, UserCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { GraduationCap, Pencil, Shield, UserCheck } from "lucide-react";
 
 import { motion } from "framer-motion"
 import { fetchBoardTrustees } from "@/store/contentSlice";
@@ -20,6 +21,7 @@ export default function AccreditationCouncilContent() {
     const trustees = useAppSelector((state) => state.content.boardTrustees.items as Trustee[]);
     const loading = useAppSelector((state) => state.content.boardTrustees.loading);
     const error = useAppSelector((state) => state.content.boardTrustees.error);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const specialRoleConfig: Record<
         string,
@@ -69,6 +71,23 @@ export default function AccreditationCouncilContent() {
         }
     }, [dispatch, loading, trustees.length]);
 
+    useEffect(() => {
+        async function checkAdmin() {
+            try {
+                const res = await fetch("/api/auth/me", {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
+                });
+                const json = (await res.json()) as { ok: boolean; isAdmin?: boolean };
+                setIsAdmin(Boolean(json.ok && json.isAdmin));
+            } catch {
+                setIsAdmin(false);
+            }
+        }
+        void checkAdmin();
+    }, []);
+
     return (
         <div className="space-y-8">
             <div className="flex items-center gap-4 pb-6 border-b-2 border-gray-200">
@@ -80,6 +99,15 @@ export default function AccreditationCouncilContent() {
                         مجلس الأمناء
                     </h2>
                 </div>
+                {isAdmin && (
+                    <Link
+                        href="/dashboard/council/board-trustees"
+                        className="ms-auto inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                    >
+                        <Pencil className="size-4" />
+                        إدارة المجلس
+                    </Link>
+                )}
             </div>
 
             {/* نص تعريفي */}

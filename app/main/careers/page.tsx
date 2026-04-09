@@ -9,6 +9,8 @@ type CareerFromAPI = {
     titleEn: string;
     descriptionAr: string;
     descriptionEn: string;
+    requirementsAr: string;
+    requirementsEn: string;
     startDate: string;
     edDate: string;
 };
@@ -155,6 +157,19 @@ export default async function Careers() {
                                                 className="pl-6 prose prose-zinc max-w-none prose-headings:text-[#254151] prose-a:text-[#6096b4] hover:prose-a:text-[#254151]"
                                                 dangerouslySetInnerHTML={{ __html: isAr ? c.descriptionAr : c.descriptionEn }}
                                             />
+                                        </div>
+
+                                        <div className="mt-6">
+                                            <h4 className="text-lg font-semibold text-[#254151] mb-3">
+                                                {isAr ? "متطلبات الوظيفة" : "Job Requirements"}
+                                            </h4>
+                                            <div className="relative">
+                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#c2a772] to-transparent rounded-full" />
+                                                <div
+                                                    className="pl-6 prose prose-zinc max-w-none prose-headings:text-[#254151] prose-a:text-[#6096b4] hover:prose-a:text-[#254151]"
+                                                    dangerouslySetInnerHTML={{ __html: isAr ? c.requirementsAr : c.requirementsEn }}
+                                                />
+                                            </div>
                                         </div>
 
                                         {/* Contact section - Glassmorphism style */}

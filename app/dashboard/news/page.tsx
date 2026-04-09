@@ -10,10 +10,10 @@ import dbConnect from "@/lib/dbConnect"
 import { NewsModel } from "@/models/news"
 
 export default async function DashboardNewsPage(
-    { searchParams }: { searchParams?: Record<string, string | string[] | undefined> }
+    { searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }
 ) {
 
-    const sp = searchParams ?? {}
+    const sp = (await searchParams) ?? {}
 
     const category = typeof sp.category === "string" ? sp.category : "all"
     const search = typeof sp.search === "string" ? sp.search : undefined

@@ -27,6 +27,7 @@ import PartnershipsContent from '@/components/about/PartnershipsContent';
 import SafetySecurityContent from '@/components/about/SafetySecurityContent';
 import CampusMapContent from '@/components/about/CampusMapContent';
 import DefaultContent from '@/components/about/DefaultContent';
+import JobsContent from '@/components/about/JobsContent';
 
 export default function AboutUs() {
     const { activeSection, expandedMenus, setExpandedMenus, navigateToSection } =
@@ -91,6 +92,8 @@ export default function AboutUs() {
                 return <PartnershipsContent />;
             case 'safety-security':
                 return <SafetySecurityContent />;
+            case 'jobs':
+                return <JobsContent />;
             case 'campus-map':
                 return <CampusMapContent />;
             default:

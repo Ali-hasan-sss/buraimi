@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { Partnership } from "@/models/Partnership";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PartnerLogoUpload } from "@/components/dashboard/partners/PartnerLogoUpload";
 
 async function createPartner(formData: FormData) {
     "use server";
@@ -15,6 +17,7 @@ async function createPartner(formData: FormData) {
     const type = String(formData.get("type") || "").trim();
     const description = String(formData.get("description") || "").trim();
     const date = String(formData.get("date") || "").trim();
+    const logo = String(formData.get("logo") || "").trim();
     const link = String(formData.get("link") || "").trim();
     const international = formData.get("international") === "on";
 
@@ -33,6 +36,7 @@ async function createPartner(formData: FormData) {
         type,
         description,
         date,
+        logo,
         link,
         international,
     });
@@ -42,57 +46,61 @@ async function createPartner(formData: FormData) {
 }
 
 export default async function NewPartnerPage() {
+    const t = await getTranslations("dashboardPartners");
+
     return (
         <div className="max-w-xl space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Add new partner</h1>
-                <p className="text-sm text-muted-foreground">Partners</p>
+                <h1 className="text-2xl font-semibold tracking-tight">{t("newTitle")}</h1>
+                <p className="text-sm text-muted-foreground">{t("listTitle")}</p>
             </div>
 
             <form action={createPartner} className="space-y-4 rounded-xl border bg-background p-4">
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="name">
-                        Name
+                        {t("fields.name")}
                     </label>
-                    <Input id="name" name="name" placeholder="Name" required />
+                    <Input id="name" name="name" placeholder={t("fields.name")} required />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="nameEn">
-                        Name (EN)
+                        {t("fields.nameEn")}
                     </label>
-                    <Input id="nameEn" name="nameEn" placeholder="English name" />
+                    <Input id="nameEn" name="nameEn" placeholder={t("fields.nameEnPlaceholder")} />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="type">
-                        Type
+                        {t("fields.type")}
                     </label>
-                    <Input id="type" name="type" placeholder="Type" />
+                    <Input id="type" name="type" placeholder={t("fields.type")} />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="description">
-                        Description
+                        {t("fields.description")}
                     </label>
                     <textarea
                         id="description"
                         name="description"
                         className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        placeholder="Description"
+                        placeholder={t("fields.description")}
                     />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="date">
-                        Date
+                        {t("fields.date")}
                     </label>
                     <Input id="date" name="date" placeholder="22-يناير-2025" />
                 </div>
 
+                <PartnerLogoUpload inputName="logo" />
+
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="link">
-                        Link
+                        {t("fields.link")}
                     </label>
                     <Input id="link" name="link" placeholder="https://..." />
                 </div>
@@ -105,13 +113,13 @@ export default async function NewPartnerPage() {
                         className="h-4 w-4 rounded border border-input"
                     />
                     <label className="text-sm" htmlFor="international">
-                        International
+                        {t("fields.international")}
                     </label>
                 </div>
 
                 <div className="flex items-center justify-end gap-2">
                     <Button type="submit" className="w-full sm:w-auto">
-                        Create
+                        {t("create")}
                     </Button>
                 </div>
             </form>

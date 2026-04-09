@@ -16,6 +16,8 @@ export async function GET() {
             titleEn: c.titleEn,
             descriptionAr: c.descriptionAr,
             descriptionEn: c.descriptionEn,
+            requirementsAr: c.requirementsAr || "",
+            requirementsEn: c.requirementsEn || "",
             startDate: c.startDate,
             edDate: c.edDate,
         }));

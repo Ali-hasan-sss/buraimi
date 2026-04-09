@@ -17,7 +17,7 @@ type Props = {
  * منطقة معاينة واحدة: النقر يفتح اختيار الملف ويُرفع تلقائياً (بدون حقل ملف ظاهر ولا زر رفع منفصل).
  */
 export default function DepartmentShowcaseImageField({ name = 'showcaseImage', defaultPath = '' }: Props) {
-    const t = useTranslations('heroAdmin');
+    const t = useTranslations('dashboardDepartments');
     const [path, setPath] = useState(defaultPath.trim());
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
@@ -70,9 +70,9 @@ export default function DepartmentShowcaseImageField({ name = 'showcaseImage', d
     return (
         <div className="space-y-2 rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30 p-4">
             <div>
-                <p className="text-sm font-medium">صورة القسم (الصفحة الرئيسية)</p>
+                <p className="text-sm font-medium">{t('showcase.title')}</p>
                 <p className="text-xs text-muted-foreground">
-                    تُعرض في «أقسام لمتابعة دراستك». انقر على المربع لاختيار صورة. بدون صورة يُستخدم التصميم الافتراضي.
+                    {t('showcase.description')}
                 </p>
             </div>
 
@@ -97,7 +97,7 @@ export default function DepartmentShowcaseImageField({ name = 'showcaseImage', d
                         'hover:border-[#6096b4] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                         uploading && 'pointer-events-none opacity-80'
                     )}
-                    aria-label={path ? t('uploadImage') : t('uploadSlideBackground')}
+                    aria-label={t('showcase.uploadImage')}
                 >
                     {path ? (
                         <>
@@ -116,20 +116,20 @@ export default function DepartmentShowcaseImageField({ name = 'showcaseImage', d
                                 )}
                             >
                                 <ImageUp className="size-8" strokeWidth={1.5} />
-                                <span className="px-2 text-xs font-medium">{t('uploadImage')}</span>
+                                <span className="px-2 text-xs font-medium">{t('showcase.uploadImage')}</span>
                             </div>
                         </>
                     ) : (
                         <div className="flex flex-col items-center justify-center gap-2 px-3 text-muted-foreground">
                             <ImageUp className="size-9 stroke-[#6096b4]" strokeWidth={1.25} />
-                            <span className="text-xs font-medium leading-tight text-[#254151]">{t('uploadImage')}</span>
+                            <span className="text-xs font-medium leading-tight text-[#254151]">{t('showcase.uploadImage')}</span>
                         </div>
                     )}
 
                     {uploading && (
                         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/85 text-[#254151]">
                             <Loader2 className="size-8 animate-spin" />
-                            <span className="text-xs font-medium">{t('uploading')}</span>
+                            <span className="text-xs font-medium">{t('showcase.uploading')}</span>
                         </div>
                     )}
                 </button>
@@ -139,8 +139,8 @@ export default function DepartmentShowcaseImageField({ name = 'showcaseImage', d
                         type="button"
                         onClick={clearImage}
                         className="absolute -right-2 -top-2 z-20 flex size-7 items-center justify-center rounded-full border border-background bg-destructive text-destructive-foreground shadow-md hover:bg-destructive/90"
-                        aria-label="إزالة الصورة"
-                        title="إزالة الصورة"
+                        aria-label={t('showcase.removeImage')}
+                        title={t('showcase.removeImage')}
                     >
                         <X className="size-3.5" strokeWidth={2.5} />
                     </button>

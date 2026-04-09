@@ -1,20 +1,23 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Crown, GraduationCap } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default function MessagesPage() {
+export default async function MessagesPage() {
+    const t = await getTranslations("dashboardMessages");
+
     const roles = [
         {
-            title: "رئيس مجلس الإدارة",
-            subtitle: "Chairman of the Board of Directors",
-            description: "إدارة الرسائل والتواصل مع رئيس مجلس الإدارة",
+            title: t("roles.chairman.title"),
+            subtitle: t("roles.chairman.subtitle"),
+            description: t("roles.chairman.description"),
             href: "/dashboard/messages/chairman",
             icon: Crown,
         },
         {
-            title: "العميد",
-            subtitle: "Dean",
-            description: "إدارة الرسائل والتواصل مع عميد الكلية",
+            title: t("roles.dean.title"),
+            subtitle: t("roles.dean.subtitle"),
+            description: t("roles.dean.description"),
             href: "/dashboard/messages/dean",
             icon: GraduationCap,
         }
@@ -23,9 +26,9 @@ export default function MessagesPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">الرسائل</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">{t("listTitle")}</h1>
                 <p className="text-sm text-muted-foreground">
-                    اختر جهة لعرض وإدارة الرسائل
+                    {t("listSubtitle")}
                 </p>
             </div>
 
@@ -40,13 +43,14 @@ export default function MessagesPage() {
                                         <Icon className="size-4 text-muted-foreground" />
                                         <div className="font-semibold">{role.title}</div>
                                     </div>
+                                    <div className="text-xs text-muted-foreground">{role.subtitle}</div>
                                     <div className="text-xs text-muted-foreground">{role.description}</div>
                                 </div>
                             </div>
 
                             <div className="mt-4">
                                 <Button asChild className="w-full">
-                                    <Link href={role.href}>عرض الرسائل</Link>
+                                    <Link href={role.href}>{t("viewMessages")}</Link>
                                 </Button>
                             </div>
                         </div>

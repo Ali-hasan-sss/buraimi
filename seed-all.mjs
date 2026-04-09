@@ -48,6 +48,19 @@ const endpoints = [
   '/api/board-directors/seed',
   '/api/board-trustees/seed',
   '/api/advisory-council/seed',
+  '/api/fact-stats/seed',
+  '/api/events/seed',
+  '/api/research-highlights/seed',
+  '/api/careers/seed',
+  '/api/social-posts/seed',
+  '/api/about-institution/seed',
+  '/api/vision-mission/seed',
+  '/api/graduate-attributes/seed',
+  '/api/academic-affiliation/seed',
+  '/api/quality-assurance/seed',
+  '/api/policies-by-department/seed',
+  '/api/organizational-structure/seed',
+  '/api/health-safety/seed',
 ];
 
 async function run() {

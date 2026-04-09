@@ -20,7 +20,7 @@ interface NewsTableProps {
 }
 
 export async function NewsTable({ data, meta: _meta }: NewsTableProps) {
-    void _meta;
+    const meta = _meta;
     const locale = await getLocale();
     const isAr = locale === "ar";
 
@@ -46,6 +46,13 @@ export async function NewsTable({ data, meta: _meta }: NewsTableProps) {
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            {meta && (
+                <div className={`px-4 py-3 border-b text-sm text-gray-500 ${isAr ? "text-right" : "text-left"}`}>
+                    {isAr
+                        ? `عرض ${data.length} من أصل ${meta.total} عنصر`
+                        : `Showing ${data.length} of ${meta.total} items`}
+                </div>
+            )}
             <Table>
                 <TableHeader>
                     <TableRow className="bg-gray-50">

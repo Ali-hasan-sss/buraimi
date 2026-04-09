@@ -1,17 +1,20 @@
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { Partnership } from "@/models/Partnership";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PartnerLogoUpload } from "@/components/dashboard/partners/PartnerLogoUpload";
 
 type PartnerDoc = {
     _id: unknown;
     order: number;
     name: string;
     nameEn: string;
+    logo?: string;
     type: string;
     description: string;
     date: string;
@@ -30,6 +33,7 @@ async function updatePartner(id: string, formData: FormData) {
     const type = String(formData.get("type") || "").trim();
     const description = String(formData.get("description") || "").trim();
     const date = String(formData.get("date") || "").trim();
+    const logo = String(formData.get("logo") || "").trim();
     const link = String(formData.get("link") || "").trim();
     const international = formData.get("international") === "on";
 
@@ -45,6 +49,7 @@ async function updatePartner(id: string, formData: FormData) {
         type,
         description,
         date,
+        logo,
         link,
         international,
     });
@@ -54,6 +59,7 @@ async function updatePartner(id: string, formData: FormData) {
 }
 
 export default async function UpdatePartnerPage({ params }: { params: Promise<{ id: string }> }) {
+    const t = await getTranslations("dashboardPartners");
     const { id } = await params;
 
     await dbConnect();
@@ -69,42 +75,42 @@ export default async function UpdatePartnerPage({ params }: { params: Promise<{ 
     return (
         <div className="max-w-xl space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Update partner</h1>
-                <p className="text-sm text-muted-foreground">Partners</p>
+                <h1 className="text-2xl font-semibold tracking-tight">{t("editTitle")}</h1>
+                <p className="text-sm text-muted-foreground">{t("listTitle")}</p>
             </div>
 
             <form action={action} className="space-y-4 rounded-xl border bg-background p-4">
                 <div className="space-y-2 hidden">
                     <label className="text-sm font-medium" htmlFor="order">
-                        Order
+                        {t("fields.order")}
                     </label>
                     <Input id="order" name="order" type="number" defaultValue={partner.order} required />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="name">
-                        Name
+                        {t("fields.name")}
                     </label>
                     <Input id="name" name="name" defaultValue={partner.name} required />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="nameEn">
-                        Name (EN)
+                        {t("fields.nameEn")}
                     </label>
                     <Input id="nameEn" name="nameEn" defaultValue={partner.nameEn} />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="type">
-                        Type
+                        {t("fields.type")}
                     </label>
                     <Input id="type" name="type" defaultValue={partner.type} />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="description">
-                        Description
+                        {t("fields.description")}
                     </label>
                     <textarea
                         id="description"
@@ -116,14 +122,16 @@ export default async function UpdatePartnerPage({ params }: { params: Promise<{ 
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="date">
-                        Date
+                        {t("fields.date")}
                     </label>
                     <Input id="date" name="date" defaultValue={partner.date} />
                 </div>
 
+                <PartnerLogoUpload inputName="logo" defaultPath={partner.logo || ""} />
+
                 <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="link">
-                        Link
+                        {t("fields.link")}
                     </label>
                     <Input id="link" name="link" defaultValue={partner.link || ""} />
                 </div>
@@ -137,13 +145,13 @@ export default async function UpdatePartnerPage({ params }: { params: Promise<{ 
                         className="h-4 w-4 rounded border border-input"
                     />
                     <label className="text-sm" htmlFor="international">
-                        International
+                        {t("fields.international")}
                     </label>
                 </div>
 
                 <div className="flex items-center justify-end gap-2">
                     <Button type="submit" className="w-full sm:w-auto">
-                        Save
+                        {t("save")}
                     </Button>
                 </div>
             </form>

@@ -3,8 +3,11 @@ import { GraduationCap, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import DeanEditForm from "./DeanEditForm";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
+import { getTranslations } from "next-intl/server";
 
 export default async function DeanMessagesPage() {
+    const t = await getTranslations("dashboardMessages");
     const data = await getMessagesData();
 
     if (!data) {
@@ -16,11 +19,11 @@ export default async function DeanMessagesPage() {
                         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ArrowLeft className="size-4" />
-                        Back to Messages
+                        {t("backToMessages")}
                     </Link>
                 </div>
                 <div className="rounded-xl border bg-background p-6 shadow-sm">
-                    <p className="text-muted-foreground">No message data found. Please seed the database first.</p>
+                    <p className="text-muted-foreground">{t("emptyState")}</p>
                 </div>
             </div>
         );
@@ -37,7 +40,7 @@ export default async function DeanMessagesPage() {
                     className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                     <ArrowLeft className="size-4" />
-                    Back to Messages
+                    {t("backToMessages")}
                 </Link>
             </div>
 
@@ -57,7 +60,7 @@ export default async function DeanMessagesPage() {
                     <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-100">
                         {dean.image ? (
                             <Image
-                                src={dean.image}
+                                src={resolveUploadImageSrc(dean.image)}
                                 alt={dean.nameEn}
                                 fill
                                 sizes="80px"
@@ -77,11 +80,16 @@ export default async function DeanMessagesPage() {
             </div>
 
             {/* Edit Form */}
-            <DeanEditForm initialParagraphs={dean.paragraphs} />
+            <DeanEditForm
+                initialNameAr={dean.nameAr}
+                initialNameEn={dean.nameEn}
+                initialImage={dean.image}
+                initialParagraphs={dean.paragraphs}
+            />
 
             {/* Preview */}
             <div className="rounded-xl border bg-background p-6 shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">معاينة الرسالة</h2>
+                <h2 className="text-lg font-semibold mb-4">{t("previewTitle")}</h2>
                 <div className="space-y-4 max-h-96 overflow-y-auto">
                     {dean.paragraphs.map((para, index) => (
                         <div key={index} className="space-y-2 p-4 bg-gray-50 rounded-lg">

@@ -21,11 +21,13 @@ export function CreateCareerForm({ isAr }: CreateCareerFormProps) {
     const [titleEn, setTitleEn] = useState("");
     const [descriptionAr, setDescriptionAr] = useState("");
     const [descriptionEn, setDescriptionEn] = useState("");
+    const [requirementsAr, setRequirementsAr] = useState("");
+    const [requirementsEn, setRequirementsEn] = useState("");
     const [startDate, setStartDate] = useState("");
     const [edDate, setEdDate] = useState("");
 
     const [fieldErrors, setFieldErrors] = useState<
-        Partial<Record<"titleAr" | "titleEn" | "descriptionAr" | "descriptionEn" | "startDate" | "edDate", string>>
+        Partial<Record<"titleAr" | "titleEn" | "descriptionAr" | "descriptionEn" | "requirementsAr" | "requirementsEn" | "startDate" | "edDate", string>>
     >({});
 
     const todayStr = useMemo(() => {
@@ -54,6 +56,8 @@ export function CreateCareerForm({ isAr }: CreateCareerFormProps) {
         if (!titleEn.trim()) nextErrors.titleEn = isAr ? "العنوان (إنجليزي) مطلوب" : "Title (English) is required";
         if (!descriptionAr.trim()) nextErrors.descriptionAr = isAr ? "الوصف (عربي) مطلوب" : "Description (Arabic) is required";
         if (!descriptionEn.trim()) nextErrors.descriptionEn = isAr ? "الوصف (إنجليزي) مطلوب" : "Description (English) is required";
+        if (!requirementsAr.trim()) nextErrors.requirementsAr = isAr ? "المتطلبات (عربي) مطلوبة" : "Requirements (Arabic) are required";
+        if (!requirementsEn.trim()) nextErrors.requirementsEn = isAr ? "المتطلبات (إنجليزي) مطلوبة" : "Requirements (English) are required";
         if (!startDate) nextErrors.startDate = isAr ? "تاريخ البداية مطلوب" : "Start date is required";
         if (!edDate) nextErrors.edDate = isAr ? "تاريخ النهاية مطلوب" : "End date is required";
 
@@ -92,6 +96,8 @@ export function CreateCareerForm({ isAr }: CreateCareerFormProps) {
                 titleEn,
                 descriptionAr,
                 descriptionEn,
+                requirementsAr,
+                requirementsEn,
                 startDate,
                 edDate,
             });
@@ -164,6 +170,30 @@ export function CreateCareerForm({ isAr }: CreateCareerFormProps) {
                         />
                     </div>
                     {fieldErrors.descriptionEn && <p className="text-sm text-red-600">{fieldErrors.descriptionEn}</p>}
+                </div>
+
+                <div className="grid gap-2">
+                    <label className="text-sm font-medium">{isAr ? "متطلبات الوظيفة (عربي)" : "Job Requirements (Arabic)"}</label>
+                    <div className={fieldErrors.requirementsAr ? "rounded-md ring-1 ring-red-600" : undefined}>
+                        <RichTextEditorField
+                            value={requirementsAr}
+                            onChange={setRequirementsAr}
+                            placeholder={isAr ? "اكتب متطلبات الوظيفة…" : "Write job requirements…"}
+                        />
+                    </div>
+                    {fieldErrors.requirementsAr && <p className="text-sm text-red-600">{fieldErrors.requirementsAr}</p>}
+                </div>
+
+                <div className="grid gap-2">
+                    <label className="text-sm font-medium">{isAr ? "متطلبات الوظيفة (إنجليزي)" : "Job Requirements (English)"}</label>
+                    <div className={fieldErrors.requirementsEn ? "rounded-md ring-1 ring-red-600" : undefined}>
+                        <RichTextEditorField
+                            value={requirementsEn}
+                            onChange={setRequirementsEn}
+                            placeholder={isAr ? "اكتب متطلبات الوظيفة…" : "Write job requirements…"}
+                        />
+                    </div>
+                    {fieldErrors.requirementsEn && <p className="text-sm text-red-600">{fieldErrors.requirementsEn}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

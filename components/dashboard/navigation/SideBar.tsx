@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { BookOpen, Contact2, GraduationCap, Handshake, Home, Landmark, LayoutDashboard, Mail, Newspaper, Package, PanelLeftClose, PanelLeftOpen, Settings, Users } from "lucide-react";
+import { Award, BookOpen, Contact2, GraduationCap, Handshake, Home, Landmark, LayoutDashboard, Mail, Newspaper, Package, PanelLeftClose, PanelLeftOpen, Settings, Users } from "lucide-react";
 
 type NavItem = {
     title: string;
@@ -20,23 +20,26 @@ export default function SideBar() {
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
     const tCouncil = useTranslations("dashboardCouncil");
+    const tNav = useTranslations("dashboardNav");
 
     const navItems = useMemo<NavItem[]>(
         () => [
-            { title: "Home", href: "/", icon: Home },
-            { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+            { title: tNav("home"), href: "/", icon: Home },
+            { title: tNav("dashboard"), href: "/dashboard", icon: LayoutDashboard },
             // { title: "Users", href: "/dashboard/users", icon: Users },
             // { title: "Settings", href: "/dashboard/settings", icon: Settings },
             { title: tCouncil("sidebarNav"), href: "/dashboard/council", icon: Landmark },
-            { title: "messages", href: "/dashboard/messages", icon: Mail },
-            { title: "partners", href: "/dashboard/partners", icon: Handshake },
-            { title: "departments", href: "/dashboard/departments", icon: BookOpen },
-            { title: "graduate programs", href: "/dashboard/graduate-programs", icon: GraduationCap },
-            { title: "news", href: "/dashboard/news", icon: Newspaper },
-            { title: "careers", href: "/dashboard/careers", icon: Package },
-            { title: "contact", href: "/dashboard/contact", icon: Contact2 },
+            { title: tNav("messages"), href: "/dashboard/messages", icon: Mail },
+            { title: tNav("partners"), href: "/dashboard/partners", icon: Handshake },
+            { title: tNav("departments"), href: "/dashboard/departments", icon: BookOpen },
+            { title: tNav("graduatePrograms"), href: "/dashboard/graduate-programs", icon: GraduationCap },
+            { title: tNav("news"), href: "/dashboard/news", icon: Newspaper },
+            { title: tNav("events"), href: "/dashboard/events", icon: Users },
+            { title: tNav("researchHighlights"), href: "/dashboard/research-highlights", icon: Award },
+            { title: tNav("careers"), href: "/dashboard/careers", icon: Package },
+            { title: tNav("contact"), href: "/dashboard/contact", icon: Contact2 },
         ],
-        [tCouncil],
+        [tCouncil, tNav],
     );
 
     return (
@@ -52,7 +55,7 @@ export default function SideBar() {
                     {!collapsed && (
                         <div className="flex items-center gap-2">
                             <div className="size-8 rounded-md border bg-muted" />
-                            <div className="text-sm font-semibold">Dashboard</div>
+                            <div className="text-sm font-semibold">{tNav("dashboard")}</div>
                         </div>
                     )}
 
@@ -62,7 +65,7 @@ export default function SideBar() {
                         size="icon"
                         className="shrink-0"
                         onClick={() => setCollapsed((v) => !v)}
-                        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        aria-label={collapsed ? tNav("expandSidebar") : tNav("collapseSidebar")}
                     >
                         {collapsed ? <PanelLeftOpen className="size-5" /> : <PanelLeftClose className="size-5" />}
                     </Button>
@@ -96,7 +99,7 @@ export default function SideBar() {
 
                 {!collapsed && (
                     <div className="border-t px-3 py-3 text-xs text-muted-foreground">
-                        Signed in
+                        {tNav("signedIn")}
                     </div>
                 )}
             </div>

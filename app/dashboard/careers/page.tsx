@@ -14,6 +14,8 @@ export default async function CareersPage() {
         titleEn: c.titleEn,
         descriptionAr: c.descriptionAr,
         descriptionEn: c.descriptionEn,
+        requirementsAr: c.requirementsAr || "",
+        requirementsEn: c.requirementsEn || "",
         startDate: c.startDate instanceof Date ? c.startDate.toISOString() : String(c.startDate),
         edDate: c.edDate instanceof Date ? c.edDate.toISOString() : String(c.edDate),
     }));

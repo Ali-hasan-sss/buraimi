@@ -8,6 +8,8 @@ export type CreateCareerInput = {
     titleEn: string;
     descriptionAr: string;
     descriptionEn: string;
+    requirementsAr: string;
+    requirementsEn: string;
     startDate: string;
     edDate: string;
 };
@@ -38,6 +40,8 @@ export async function createCareerAction(input: CreateCareerInput): Promise<{ ok
             titleEn: input.titleEn,
             descriptionAr: input.descriptionAr,
             descriptionEn: input.descriptionEn,
+            requirementsAr: input.requirementsAr,
+            requirementsEn: input.requirementsEn,
             startDate: start,
             edDate: end,
         });

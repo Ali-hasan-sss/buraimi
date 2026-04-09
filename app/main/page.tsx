@@ -18,6 +18,8 @@ import {
 } from "@/lib/site-contact-settings";
 import { listGradProgramsForCarousel } from "@/lib/graduate-program-public";
 import { DepartmentModel } from "@/models/Department";
+import { Partnership } from "@/models/Partnership";
+import { NewsModel } from "@/models/news";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +30,23 @@ export default async function Main() {
     const mainSocialLinks = socialProfileLinksForStrip(siteContact.socialLinks);
     const deptDocs = await DepartmentModel.find({}).sort({ domain: 1 }).lean();
     const graduateCarousel = await listGradProgramsForCarousel();
+    const partnerDocs = await Partnership.find({}).sort({ order: 1 }).lean();
+    const categories = ["events", "academic", "research", "partnerships"] as const;
+    const latestByCategoryDocs = await Promise.all(
+        categories.map((category) =>
+            NewsModel.findOne({ category })
+                .sort({ date: -1, createdAt: -1 })
+                .lean()
+        )
+    );
+    const latestNewsByCategory = latestByCategoryDocs
+        .filter((doc): doc is NonNullable<typeof doc> => Boolean(doc))
+        .map((doc) => ({
+            titleAr: doc.titleAr,
+            titleEn: doc.titleEn,
+            image: doc.image,
+            link: doc.link?.trim() ? doc.link : "/main/news",
+        }));
 
     const showcaseColleges = mapDepartmentsToShowcaseCards(
         deptDocs.map((doc) => ({
@@ -53,11 +72,11 @@ export default async function Main() {
             <FactsAndStats />
             <EventsSection />
             <ResearchHighlights />
-            <NewsHighlights />
+            <NewsHighlights items={latestNewsByCategory} />
             <CampusExperience />
 
             <SocialMediaFeed socialLinks={mainSocialLinks} />
-            <Partners />
+            <Partners partners={partnerDocs.map((p) => ({ _id: String(p._id), name: p.name, logo: (p as { logo?: string }).logo, link: (p as { link?: string }).link }))} />
         </div>
     )
 }

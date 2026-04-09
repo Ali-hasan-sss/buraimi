@@ -1,6 +1,6 @@
 "use client"
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -25,6 +25,8 @@ export default function TablePaginationController(
 
     const totalPages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
     const currentPage = Math.min(Math.max(1, page), totalPages);
+    const startItem = total === 0 ? 0 : (currentPage - 1) * limit + 1;
+    const endItem = total === 0 ? 0 : Math.min(total, currentPage * limit);
 
 
     const pushParams = (updates: Record<string, string | null>) => {
@@ -39,7 +41,7 @@ export default function TablePaginationController(
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
                 <p className="text-sm text-gray-500">
                     {t("Rows")}
                 </p>
@@ -62,6 +64,10 @@ export default function TablePaginationController(
                         <SelectItem className="text-popover-foreground focus:bg-accent focus:text-accent-foreground" value="100">100</SelectItem>
                     </SelectContent>
                 </Select>
+
+                <p className="text-xs text-gray-500">
+                    {startItem}-{endItem} / {total}
+                </p>
 
             </div>
 

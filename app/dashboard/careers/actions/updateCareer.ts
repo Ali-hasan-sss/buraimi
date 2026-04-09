@@ -13,6 +13,8 @@ export async function updateCareerAction(formData: FormData) {
     const titleEn = String(formData.get("titleEn") || "");
     const descriptionAr = String(formData.get("descriptionAr") || "");
     const descriptionEn = String(formData.get("descriptionEn") || "");
+    const requirementsAr = String(formData.get("requirementsAr") || "");
+    const requirementsEn = String(formData.get("requirementsEn") || "");
     const startDateStr = String(formData.get("startDate") || "");
     const edDateStr = String(formData.get("edDate") || "");
 
@@ -20,7 +22,7 @@ export async function updateCareerAction(formData: FormData) {
         throw new Error("Missing career id");
     }
 
-    if (!titleAr.trim() || !titleEn.trim() || !descriptionAr.trim() || !descriptionEn.trim() || !startDateStr || !edDateStr) {
+    if (!titleAr.trim() || !titleEn.trim() || !descriptionAr.trim() || !descriptionEn.trim() || !requirementsAr.trim() || !requirementsEn.trim() || !startDateStr || !edDateStr) {
         throw new Error("Missing required fields");
     }
 
@@ -50,6 +52,8 @@ export async function updateCareerAction(formData: FormData) {
             titleEn,
             descriptionAr,
             descriptionEn,
+            requirementsAr,
+            requirementsEn,
             startDate: start,
             edDate: end,
         },

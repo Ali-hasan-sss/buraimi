@@ -1,9 +1,11 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Mail } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
+import Link from "next/link";
+import { Pencil } from "lucide-react";
 import { fetchAboutMessages } from "@/store/contentSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
@@ -14,6 +16,7 @@ export default function DeanMessageContent() {
     const messageData = useAppSelector((state) => state.content.aboutMessages.data);
     const loading = useAppSelector((state) => state.content.aboutMessages.loading);
     const error = useAppSelector((state) => state.content.aboutMessages.error);
+    const [isAdmin, setIsAdmin] = useState(false);
     const data = messageData?.dean;
     const isRtl = locale == "ar" ? true : false
 
@@ -22,6 +25,23 @@ export default function DeanMessageContent() {
             void dispatch(fetchAboutMessages());
         }
     }, [dispatch, loading, messageData]);
+
+    useEffect(() => {
+        async function checkAdmin() {
+            try {
+                const res = await fetch("/api/auth/me", {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
+                });
+                const json = (await res.json()) as { ok: boolean; isAdmin?: boolean };
+                setIsAdmin(Boolean(json.ok && json.isAdmin));
+            } catch {
+                setIsAdmin(false);
+            }
+        }
+        void checkAdmin();
+    }, []);
 
     if (loading) {
         return <div className="text-[#254151] font-bold">Loading...</div>;
@@ -46,6 +66,15 @@ export default function DeanMessageContent() {
                         {isRtl ? data.positionAr : data.positionEn}
                     </h2>
                 </div>
+                {isAdmin && (
+                    <Link
+                        href="/dashboard/messages/dean"
+                        className="ms-auto inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                    >
+                        <Pencil className="size-4" />
+                        {isRtl ? "تعديل الرسالة" : "Edit Message"}
+                    </Link>
+                )}
             </div>
 
             {/* رسالة عميد الكلية */}

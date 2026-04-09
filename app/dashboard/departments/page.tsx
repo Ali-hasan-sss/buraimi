@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { DepartmentModel } from "@/models/Department";
@@ -27,6 +28,7 @@ async function deleteDepartment(formData: FormData) {
 }
 
 export default async function DepartmentsPage() {
+    const t = await getTranslations("dashboardDepartments");
     await dbConnect();
     const departments = (await DepartmentModel.find({}).sort({ domain: 1 }).lean()) as DepartmentDoc[];
 
@@ -34,16 +36,16 @@ export default async function DepartmentsPage() {
         <div className="space-y-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">Departments</h1>
-                    <p className="text-sm text-muted-foreground">Manage academic departments</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">{t("listTitle")}</h1>
+                    <p className="text-sm text-muted-foreground">{t("listSubtitle")}</p>
                 </div>
                 <Button asChild className="w-full sm:w-auto">
-                    <Link href="/dashboard/departments/new">Add new department</Link>
+                    <Link href="/dashboard/departments/new">{t("addNew")}</Link>
                 </Button>
             </div>
 
             {departments.length === 0 ? (
-                <div className="rounded-xl border bg-background p-6 text-sm text-muted-foreground">No departments found.</div>
+                <div className="rounded-xl border bg-background p-6 text-sm text-muted-foreground">{t("emptyState")}</div>
             ) : (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {departments.map((dept) => (
@@ -59,13 +61,13 @@ export default async function DepartmentsPage() {
 
                                             <div className="flex items-center gap-2">
                                                 <Button asChild size="sm" variant="secondary" className="h-8">
-                                                    <Link href={`/dashboard/departments/${String(dept._id)}`}>view</Link>
+                                                    <Link href={`/dashboard/departments/${String(dept._id)}`}>{t("view")}</Link>
                                                 </Button>
 
                                                 <form action={deleteDepartment}>
                                                     <input type="hidden" name="id" value={String(dept._id)} />
                                                     <Button type="submit" size="sm" variant="destructive" className="h-8">
-                                                        Delete
+                                                        {t("delete")}
                                                     </Button>
                                                 </form>
                                             </div>

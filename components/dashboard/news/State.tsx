@@ -1,6 +1,4 @@
 "use client"
-import { NewsItemFromAPI } from "@/types/news";
-
 import { Newspaper, Star, TrendingUp } from "lucide-react"
 import { useLocale } from "next-intl";
 

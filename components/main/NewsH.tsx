@@ -2,8 +2,7 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Image, { StaticImageData } from 'next/image';
-import { NewsData } from '@/staticData/landing';
+import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 
@@ -11,12 +10,10 @@ interface NewsItem {
     titleAr: string;
     titleEn: string;
     link: string;
-    image: StaticImageData | string;
+    image: string;
 }
 
-const allNewsItems: NewsItem[] = NewsData
-
-export function NewsHighlights() {
+export function NewsHighlights({ items }: { items: NewsItem[] }) {
     const [currentPage, setCurrentPage] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
     const [dragStart, setDragStart] = useState<number | null>(null);
@@ -25,7 +22,9 @@ export function NewsHighlights() {
     const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const itemsPerPage = 4;
-    const totalPages = Math.ceil(allNewsItems.length / itemsPerPage);
+    const allNewsItems = items;
+    const totalPages = Math.max(1, Math.ceil(allNewsItems.length / itemsPerPage));
+    const canSlide = allNewsItems.length > itemsPerPage;
 
     const currentNews = useMemo(() => {
         return allNewsItems.slice(
@@ -63,7 +62,7 @@ export function NewsHighlights() {
 
         const threshold = 50;
 
-        if (Math.abs(dragOffset) > threshold) {
+        if (Math.abs(dragOffset) > threshold && canSlide) {
             setIsAnimating(true);
 
             const newPage = dragOffset > 0
@@ -81,7 +80,7 @@ export function NewsHighlights() {
             setDragOffset(0);
             setDragStart(null);
         }
-    }, [currentPage, dragOffset, isDragging, totalPages]);
+    }, [canSlide, currentPage, dragOffset, isDragging, totalPages]);
 
     const locale = useLocale()
     const t = useTranslations("general")
@@ -163,6 +162,11 @@ export function NewsHighlights() {
                         )
                     })}
                 </div>
+                {currentNews.length === 0 && (
+                    <div className="text-center text-gray-500 py-10">
+                        {locale === "ar" ? "لا توجد أخبار متاحة حالياً" : "No news available at the moment"}
+                    </div>
+                )}
 
                 {/* Archive Button with Divider */}
                 <div className="relative flex items-center justify-center mt-16">
@@ -184,7 +188,7 @@ export function NewsHighlights() {
                         <button
                             onMouseDown={handleDragStart}
                             onTouchStart={handleDragStart}
-                            disabled={isAnimating}
+                            disabled={isAnimating || !canSlide}
                             type="button"
                             aria-label="Swipe to navigate news"
                             className={`relative bg-[#0ea5a5] rounded-2xl flex items-center justify-center hover:scale-110 transition-all cursor-grab active:cursor-grabbing shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${isDragging ? 'scale-125 shadow-2xl' : ''

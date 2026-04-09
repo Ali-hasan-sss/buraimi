@@ -100,3 +100,78 @@ export async function updateDeanParagraphs(paragraphs: MessageParagraph[]) {
         return { error: "Failed to update dean paragraphs" };
     }
 }
+
+interface UpdateRolePayload {
+    nameAr: string;
+    nameEn: string;
+    image: string;
+    paragraphs: MessageParagraph[];
+}
+
+export async function updateChairmanMessage(payload: UpdateRolePayload) {
+    try {
+        await Promise.race([
+            dbConnect(),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Database connection timeout")), MAX_WAIT_MS)
+            ),
+        ]);
+
+        const result = await messageModel.findOneAndUpdate(
+            {},
+            {
+                $set: {
+                    "chairman.nameAr": payload.nameAr.trim(),
+                    "chairman.nameEn": payload.nameEn.trim(),
+                    "chairman.image": payload.image.trim(),
+                    "chairman.paragraphs": payload.paragraphs,
+                },
+            },
+            { new: true, upsert: true }
+        );
+
+        if (!result) {
+            return { error: "Failed to update chairman message" };
+        }
+
+        revalidatePath("/dashboard/messages/chairman");
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating chairman message:", error);
+        return { error: "Failed to update chairman message" };
+    }
+}
+
+export async function updateDeanMessage(payload: UpdateRolePayload) {
+    try {
+        await Promise.race([
+            dbConnect(),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Database connection timeout")), MAX_WAIT_MS)
+            ),
+        ]);
+
+        const result = await messageModel.findOneAndUpdate(
+            {},
+            {
+                $set: {
+                    "dean.nameAr": payload.nameAr.trim(),
+                    "dean.nameEn": payload.nameEn.trim(),
+                    "dean.image": payload.image.trim(),
+                    "dean.paragraphs": payload.paragraphs,
+                },
+            },
+            { new: true, upsert: true }
+        );
+
+        if (!result) {
+            return { error: "Failed to update dean message" };
+        }
+
+        revalidatePath("/dashboard/messages/dean");
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating dean message:", error);
+        return { error: "Failed to update dean message" };
+    }
+}

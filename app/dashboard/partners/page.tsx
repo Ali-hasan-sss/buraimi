@@ -1,16 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import dbConnect from "@/lib/dbConnect";
 import { Partnership } from "@/models/Partnership";
 
 import { Button } from "@/components/ui/button";
+import { resolveUploadImageSrc } from "@/lib/upload-public-url";
 
 type PartnerDoc = {
     _id: unknown;
     order: number;
     name: string;
     nameEn: string;
+    logo?: string;
     type: string;
     description: string;
     date: string;
@@ -30,6 +34,7 @@ async function deletePartner(formData: FormData) {
 }
 
 export default async function Partners() {
+    const t = await getTranslations("dashboardPartners");
     await dbConnect();
     const partners = (await Partnership.find({}).sort({ order: 1 }).lean()) as PartnerDoc[];
 
@@ -37,16 +42,16 @@ export default async function Partners() {
         <div className="space-y-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">Partners</h1>
-                    <p className="text-sm text-muted-foreground">Manage partnerships</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">{t("listTitle")}</h1>
+                    <p className="text-sm text-muted-foreground">{t("listSubtitle")}</p>
                 </div>
                 <Button asChild className="w-full sm:w-auto">
-                    <Link href="/dashboard/partners/new">Add new partner</Link>
+                    <Link href="/dashboard/partners/new">{t("addNew")}</Link>
                 </Button>
             </div>
 
             {partners.length === 0 ? (
-                <div className="rounded-xl border bg-background p-6 text-sm text-muted-foreground">No partners found.</div>
+                <div className="rounded-xl border bg-background p-6 text-sm text-muted-foreground">{t("emptyState")}</div>
             ) : (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {partners.map((partner) => (
@@ -59,6 +64,15 @@ export default async function Partners() {
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between gap-3">
                                             <div className="flex items-center gap-2">
+                                                <div className="relative w-10 h-10 rounded-md bg-white/20 overflow-hidden">
+                                                    <Image
+                                                        src={resolveUploadImageSrc(partner.logo?.trim() || "/assets/landing/partners/partner-1.webp")}
+                                                        alt={partner.name}
+                                                        fill
+                                                        className="object-contain p-1"
+                                                        sizes="40px"
+                                                    />
+                                                </div>
                                                 <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
                                                     <span className="text-white font-bold">{partner.order}</span>
                                                 </div>
@@ -67,13 +81,13 @@ export default async function Partners() {
 
                                             <div className="flex items-center gap-2">
                                                 <Button asChild size="sm" variant="secondary" className="h-8">
-                                                    <Link href={`/dashboard/partners/${String(partner._id)}`}>Update</Link>
+                                                    <Link href={`/dashboard/partners/${String(partner._id)}`}>{t("update")}</Link>
                                                 </Button>
 
                                                 <form action={deletePartner}>
                                                     <input type="hidden" name="id" value={String(partner._id)} />
                                                     <Button type="submit" size="sm" variant="destructive" className="h-8">
-                                                        Delete
+                                                        {t("delete")}
                                                     </Button>
                                                 </form>
                                             </div>
@@ -105,7 +119,9 @@ export default async function Partners() {
 
                                 <div className="flex items-center justify-between gap-2 pt-3 border-t border-gray-100 text-sm">
                                     <span className="text-gray-600">{partner.date || "-"}</span>
-                                    <span className="text-gray-600">{partner.international ? "International" : "Local"}</span>
+                                    <span className="text-gray-600">
+                                        {partner.international ? t("international") : t("local")}
+                                    </span>
                                 </div>
                             </div>
                         </div>

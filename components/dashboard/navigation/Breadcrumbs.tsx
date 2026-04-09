@@ -20,21 +20,33 @@ function titleCase(input: string) {
         .join(" ");
 }
 
-/** next-intl keys under `dashboardCouncil` */
 const SEG_TRANSLATION_KEY: Record<string, string> = {
     dashboard: "crumbDashboard",
-    council: "hubTitle",
-    "board-trustees": "trusteesTitle",
-    "board-directors": "directorsTitle",
-    "advisory-council": "advisoryTitle",
-    "college-council": "collegeTitle",
-    new: "crumbNew",
+    council: "crumbCouncil",
+    "board-trustees": "crumbBoardTrustees",
+    "board-directors": "crumbBoardDirectors",
+    "advisory-council": "crumbAdvisoryCouncil",
+    "college-council": "crumbCollegeCouncil",
+    messages: "crumbMessages",
+    partners: "crumbPartners",
+    departments: "crumbDepartments",
     "graduate-programs": "crumbGraduatePrograms",
+    news: "crumbNews",
+    events: "crumbEvents",
+    "research-highlights": "crumbResearchHighlights",
+    careers: "crumbCareers",
+    contact: "crumbContact",
+    create: "crumbCreate",
+    new: "crumbNew",
+    edit: "crumbEdit",
+    programs: "crumbPrograms",
+    "study-plan": "crumbStudyPlan",
+    objective: "crumbObjective",
 };
 
 export default function Breadcrumbs() {
     const pathname = usePathname() || "/";
-    const t = useTranslations("dashboardCouncil");
+    const t = useTranslations("dashboardNav");
 
     const crumbs = useMemo<Crumb[]>(() => {
         const cleanPath = pathname.split("?")[0].split("#")[0];
@@ -71,7 +83,7 @@ export default function Breadcrumbs() {
     if (crumbs.length === 0) return null;
 
     return (
-        <nav aria-label="Breadcrumb" className="hidden lg:block mb-4">
+        <nav aria-label={t("breadcrumbAria")} className="hidden lg:block mb-4">
             <ol className="inline-flex items-center gap-1 rounded-full border bg-background/60 px-2 py-1 text-sm text-foreground/90 shadow-sm backdrop-blur">
                 {crumbs.map((c, idx) => (
                     <li key={c.href} className="inline-flex items-center">

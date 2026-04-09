@@ -48,6 +48,8 @@ export function CareersEditDialog({ item, isAr, children }: CareersEditDialogPro
     const [titleEn, setTitleEn] = useState(item.titleEn);
     const [descriptionAr, setDescriptionAr] = useState(item.descriptionAr);
     const [descriptionEn, setDescriptionEn] = useState(item.descriptionEn);
+    const [requirementsAr, setRequirementsAr] = useState(item.requirementsAr);
+    const [requirementsEn, setRequirementsEn] = useState(item.requirementsEn);
     const [startDate, setStartDate] = useState(toInputDate(item.startDate));
     const [edDate, setEdDate] = useState(toInputDate(item.edDate));
 
@@ -117,6 +119,26 @@ export function CareersEditDialog({ item, isAr, children }: CareersEditDialogPro
                             value={descriptionEn}
                             onChange={setDescriptionEn}
                             placeholder={isAr ? "اكتب وصف الوظيفة…" : "Write the career description…"}
+                        />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <label className="text-sm font-medium">{isAr ? "متطلبات الوظيفة (عربي)" : "Job Requirements (Arabic)"}</label>
+                        <input type="hidden" name="requirementsAr" value={requirementsAr} readOnly />
+                        <RichTextEditorField
+                            value={requirementsAr}
+                            onChange={setRequirementsAr}
+                            placeholder={isAr ? "اكتب متطلبات الوظيفة…" : "Write job requirements…"}
+                        />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <label className="text-sm font-medium">{isAr ? "متطلبات الوظيفة (إنجليزي)" : "Job Requirements (English)"}</label>
+                        <input type="hidden" name="requirementsEn" value={requirementsEn} readOnly />
+                        <RichTextEditorField
+                            value={requirementsEn}
+                            onChange={setRequirementsEn}
+                            placeholder={isAr ? "اكتب متطلبات الوظيفة…" : "Write job requirements…"}
                         />
                     </div>
 

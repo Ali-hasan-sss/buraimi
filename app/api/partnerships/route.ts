@@ -25,6 +25,7 @@ export async function POST(request: Request) {
             order?: number;
             name?: string;
             nameEn?: string;
+            logo?: string;
             type?: string;
             description?: string;
             date?: string;
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
             order,
             name,
             nameEn: (body.nameEn || '').trim(),
+            logo: (body.logo || '').trim(),
             type: (body.type || '').trim(),
             description: (body.description || '').trim(),
             date: (body.date || '').trim(),

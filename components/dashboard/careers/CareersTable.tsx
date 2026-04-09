@@ -22,6 +22,8 @@ export type CareerRow = {
     titleEn: string;
     descriptionAr: string;
     descriptionEn: string;
+    requirementsAr: string;
+    requirementsEn: string;
     startDate: string;
     edDate: string;
 };

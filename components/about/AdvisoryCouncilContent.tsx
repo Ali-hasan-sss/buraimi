@@ -1,8 +1,9 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Briefcase, GraduationCap, Users } from "lucide-react";
+import { Briefcase, GraduationCap, Pencil, Users } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import { CouncilMemberAvatar } from "@/components/about/CouncilMemberAvatar";
 
@@ -18,6 +19,7 @@ export default function AdvisoryCouncilContent() {
     const [member, setMember] = useState<AdvisoryCouncil[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -50,6 +52,23 @@ export default function AdvisoryCouncilContent() {
         };
     }, [])
 
+    useEffect(() => {
+        async function checkAdmin() {
+            try {
+                const res = await fetch("/api/auth/me", {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
+                });
+                const json = (await res.json()) as { ok: boolean; isAdmin?: boolean };
+                setIsAdmin(Boolean(json.ok && json.isAdmin));
+            } catch {
+                setIsAdmin(false);
+            }
+        }
+        void checkAdmin();
+    }, []);
+
 
     const headeMember = member.filter((m) => m.role !== 'عضو' && m.role !== 'industry')
     const academicMembers = member.filter((m) => m.role === 'عضو')
@@ -70,6 +89,15 @@ export default function AdvisoryCouncilContent() {
                         المجلس الاستشاري من القطاع الصناعي
                     </h2>
                 </div>
+                {isAdmin && (
+                    <Link
+                        href="/dashboard/council/advisory-council"
+                        className="ms-auto inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                    >
+                        <Pencil className="size-4" />
+                        إدارة المجلس
+                    </Link>
+                )}
             </div>
             {
                 member.length === 0 ?
