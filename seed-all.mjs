@@ -61,6 +61,9 @@ const endpoints = [
   '/api/policies-by-department/seed',
   '/api/organizational-structure/seed',
   '/api/health-safety/seed',
+  '/api/plans-reports/seed',
+  '/api/campus-map/seed',
+  '/api/foundation-program/seed',
 ];
 
 async function run() {

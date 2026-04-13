@@ -2,6 +2,7 @@ import heroBackgroundImg from '@/public/assets/e5066bb78bcc5febdd38697aa9400a49d
 import Image from 'next/image';
 import { getLocale } from 'next-intl/server';
 import { Briefcase, Calendar, Mail, Phone, Sparkles } from 'lucide-react';
+import AdminCareersDashboardButton from '@/components/main/AdminCareersDashboardButton';
 
 type CareerFromAPI = {
     id: string;
@@ -61,6 +62,9 @@ export default async function Careers() {
                             : "Join our team and build your professional future with Al Buraimi University College"
                         }
                     </p>
+                    <div className="mt-6 flex items-center justify-center">
+                        <AdminCareersDashboardButton />
+                    </div>
                 </div>
             </div>
 

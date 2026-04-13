@@ -1,24 +1,140 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { GraduationCap, BookOpen, Target, Users, Award, Phone, Mail, ChevronLeft, CheckCircle, TrendingUp, Globe, Lightbulb, Calculator, Monitor, FileText, ClipboardCheck, Clock } from 'lucide-react';
+import { GraduationCap, BookOpen, Target, Users, Award, ChevronLeft, CheckCircle, TrendingUp, Globe, Lightbulb, Calculator, Monitor, FileText, ClipboardCheck, Clock, Pencil, Save, X, Loader2 } from 'lucide-react';
 
-import foundationImage from 'figma:asset/7e06954d89f4af64a098a92963c0ff05b99a4be5.png';
-import FoundHero from '@/components/FoundationProgramPage/FoundationHero';
 import FoundCTA from '@/components/FoundationProgramPage/FoundCTA';
 import FoundSideBar from '@/components/FoundationProgramPage/SideBar';
-import FoundOverview from '@/components/FoundationProgramPage/Overview';
-import FoundAdmission from '@/components/FoundationProgramPage/Admission';
 import FoundStudy from '@/components/FoundationProgramPage/Study';
+import Image from "next/image";
+import { useLocale } from 'next-intl';
+
+type FoundationProgramData = {
+    level1Courses: Array<{ code: string; titleAr: string; titleEn: string; credits: number }>;
+    level2Courses: Array<{ code: string; titleAr: string; titleEn: string; credits: number }>;
+    heroTitleAr: string; heroTitleEn: string; heroSubtitleAr: string; heroSubtitleEn: string;
+    overviewTitleAr: string; overviewTitleEn: string; overviewText1Ar: string; overviewText1En: string; overviewText2Ar: string; overviewText2En: string;
+    admissionTitleAr: string; admissionTitleEn: string; admissionTextAr: string; admissionTextEn: string;
+    studyTitleAr: string; studyTitleEn: string; studyNoteAr: string; studyNoteEn: string;
+    visionSectionTitleAr: string; visionSectionTitleEn: string; visionTitleAr: string; visionTitleEn: string; visionTextAr: string; visionTextEn: string;
+    missionTitleAr: string; missionTitleEn: string; missionTextAr: string; missionTextEn: string;
+};
 
 export default function FoundationProgramPage() {
     const [activeSidebarItem, setActiveSidebarItem] = useState('overview');
+    const locale = useLocale();
+    const isAr = locale === "ar";
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [editingSection, setEditingSection] = useState<"hero" | "overview" | "admission" | "study" | "vision" | null>(null);
+    const [saving, setSaving] = useState(false);
+    const [data, setData] = useState<FoundationProgramData | null>(null);
+    const [draft, setDraft] = useState<FoundationProgramData | null>(null);
 
+    useEffect(() => {
+        void (async () => {
+            try {
+                const [res, meRes] = await Promise.all([
+                    fetch("/api/foundation-program", { cache: "no-store" }),
+                    fetch("/api/auth/me", { method: "GET", credentials: "include", cache: "no-store" }),
+                ]);
+                const json = (await res.json()) as { ok?: boolean; data?: FoundationProgramData };
+                const me = (await meRes.json()) as { ok?: boolean; isAdmin?: boolean };
+                if (json.ok && json.data) setData(json.data);
+                setIsAdmin(Boolean(me.ok && me.isAdmin));
+            } catch {
+                setIsAdmin(false);
+            }
+        })();
+    }, []);
+
+    const view = draft ?? data;
+    const updateDraft = (patch: Partial<FoundationProgramData>) => setDraft((prev) => (prev ? ({ ...prev, ...patch }) : prev));
+
+    const startEdit = (section: "hero" | "overview" | "admission" | "study" | "vision") => {
+        if (!data) return;
+        if (!draft) setDraft({ ...data });
+        setEditingSection(section);
+    };
+    const cancelEdit = () => {
+        setEditingSection(null);
+        setDraft(data ? { ...data } : null);
+    };
+    const saveEdit = async () => {
+        if (!draft) return;
+        setSaving(true);
+        try {
+            const res = await fetch("/api/foundation-program", {
+                method: "PUT",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(draft),
+            });
+            const json = (await res.json()) as { ok?: boolean; data?: FoundationProgramData };
+            if (res.ok && json.ok && json.data) {
+                setData(json.data);
+                setDraft({ ...json.data });
+                setEditingSection(null);
+            }
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (!view) return <div className="py-16 flex items-center justify-center"><Loader2 className="size-6 animate-spin text-[#254151]" /></div>;
 
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
-            <FoundHero />
+            <section className="relative h-[400px] overflow-hidden">
+                <Image
+                    src="https://images.unsplash.com/photo-1759922378123-a1f4f1e39bae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHVkZW50cyUyMHN0dWR5aW5nJTIwY2xhc3Nyb29tJTIwZWR1Y2F0aW9ufGVufDF8fHx8MTc3MzE2MTY5MXww&ixlib=rb-4.1.0&q=80&w=1080"
+                    alt="Students Studying"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#254151]/95 to-[#6096b4]/90"></div>
+                <div className="relative h-full flex items-center justify-center text-white text-center px-4">
+                    <div className="max-w-5xl">
+                        {isAdmin && (
+                            <div className="mb-4 flex justify-center gap-2">
+                                {editingSection !== "hero" ? (
+                                    <button onClick={() => startEdit("hero")} className="inline-flex items-center gap-2 rounded-lg bg-white/20 px-4 py-2">
+                                        <Pencil className="size-4" />{isAr ? "تعديل الصفحة" : "Edit page"}
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button onClick={cancelEdit} className="inline-flex items-center gap-2 rounded-lg bg-white/20 px-4 py-2">
+                                            <X className="size-4" />{isAr ? "إلغاء" : "Cancel"}
+                                        </button>
+                                        <button onClick={saveEdit} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#c2a772] px-4 py-2 text-white disabled:opacity-60">
+                                            {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}{isAr ? "حفظ" : "Save"}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                        <div className="flex justify-center mb-6">
+                            <div className="bg-white/20 backdrop-blur-sm p-5 rounded-full">
+                                <GraduationCap className="size-16 text-white" />
+                            </div>
+                        </div>
+                        {editingSection !== "hero" ? (
+                            <>
+                                <h1 className="text-5xl font-bold mb-4">{isAr ? view.heroTitleAr : view.heroTitleEn}</h1>
+                                <h2 className="text-2xl font-bold mb-6">{isAr ? view.heroTitleEn : view.heroTitleAr}</h2>
+                                <p className="text-xl opacity-95">{isAr ? view.heroSubtitleAr : view.heroSubtitleEn}</p>
+                            </>
+                        ) : (
+                            <div className="grid gap-2 max-w-3xl mx-auto">
+                                <input className="rounded-md border border-white/40 bg-white/10 px-3 py-2 text-white" value={draft?.heroTitleAr || ""} onChange={(e) => updateDraft({ heroTitleAr: e.target.value })} dir="rtl" />
+                                <input className="rounded-md border border-white/40 bg-white/10 px-3 py-2 text-white" value={draft?.heroTitleEn || ""} onChange={(e) => updateDraft({ heroTitleEn: e.target.value })} dir="ltr" />
+                                <input className="rounded-md border border-white/40 bg-white/10 px-3 py-2 text-white" value={draft?.heroSubtitleAr || ""} onChange={(e) => updateDraft({ heroSubtitleAr: e.target.value })} dir="rtl" />
+                                <input className="rounded-md border border-white/40 bg-white/10 px-3 py-2 text-white" value={draft?.heroSubtitleEn || ""} onChange={(e) => updateDraft({ heroSubtitleEn: e.target.value })} dir="ltr" />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
             {/* Main Content with Sidebar */}
             <section className="py-16 bg-gray-50">
                 <div className="container mx-auto px-4">
@@ -29,17 +145,91 @@ export default function FoundationProgramPage() {
                         {/* Main Content */}
                         <div className="flex-1">
                             {/* Overview Section */}
-                            <FoundOverview />
+                            <div id="overview" className="mb-16">
+                                <div className="bg-white rounded-lg shadow-xl p-10 border-2 border-blue-200">
+                                    <div className="flex items-center justify-between gap-4 mb-6">
+                                        <div className="flex items-center gap-4">
+                                        <div className="bg-blue-600 text-white p-4 rounded-full">
+                                            <BookOpen className="size-8" />
+                                        </div>
+                                        <h2 className="text-3xl font-bold text-[#254151]">{isAr ? view.overviewTitleAr : view.overviewTitleEn}</h2>
+                                        </div>
+                                        {isAdmin && editingSection !== "overview" && (
+                                            <button onClick={() => startEdit("overview")} className="inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white">
+                                                <Pencil className="size-4" />{isAr ? "تعديل القسم" : "Edit Section"}
+                                            </button>
+                                        )}
+                                    </div>
+                                    {editingSection !== "overview" ? (
+                                        <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                                            <p className="text-xl mb-4">{isAr ? view.overviewText1Ar : view.overviewText1En}</p>
+                                            <p className="text-lg">{isAr ? view.overviewText2Ar : view.overviewText2En}</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid gap-2">
+                                            <input className="w-full rounded-md border px-3 py-2" value={draft?.overviewTitleAr || ""} onChange={(e) => updateDraft({ overviewTitleAr: e.target.value })} dir="rtl" />
+                                            <input className="w-full rounded-md border px-3 py-2" value={draft?.overviewTitleEn || ""} onChange={(e) => updateDraft({ overviewTitleEn: e.target.value })} dir="ltr" />
+                                            <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.overviewText1Ar || ""} onChange={(e) => updateDraft({ overviewText1Ar: e.target.value })} dir="rtl" />
+                                            <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.overviewText1En || ""} onChange={(e) => updateDraft({ overviewText1En: e.target.value })} dir="ltr" />
+                                            <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.overviewText2Ar || ""} onChange={(e) => updateDraft({ overviewText2Ar: e.target.value })} dir="rtl" />
+                                            <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.overviewText2En || ""} onChange={(e) => updateDraft({ overviewText2En: e.target.value })} dir="ltr" />
+                                            <div className="flex justify-end gap-2 pt-2">
+                                                <button onClick={cancelEdit} className="inline-flex items-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700"><X className="size-4" />{isAr ? "إلغاء" : "Cancel"}</button>
+                                                <button onClick={saveEdit} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#c2a772] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}{isAr ? "حفظ" : "Save"}</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                             {/* Admission Requirements */}
-                            <FoundAdmission />
+                            <div id="admission" className="mb-16">
+                                <div className="bg-white rounded-lg shadow-xl p-10 border-2 border-green-200">
+                                    <div className="flex items-center justify-between gap-4 mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-green-600 text-white p-4 rounded-full">
+                                                <ClipboardCheck className="size-8" />
+                                            </div>
+                                            <h2 className="text-3xl font-bold text-[#254151]">{isAr ? view.admissionTitleAr : view.admissionTitleEn}</h2>
+                                        </div>
+                                        {isAdmin && editingSection !== "admission" && (
+                                            <button onClick={() => startEdit("admission")} className="inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white">
+                                                <Pencil className="size-4" />{isAr ? "تعديل القسم" : "Edit Section"}
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg border-2 border-green-200">
+                                        {editingSection !== "admission" ? (
+                                            <p className="text-gray-700 text-lg leading-relaxed">{isAr ? view.admissionTextAr : view.admissionTextEn}</p>
+                                        ) : (
+                                            <div className="grid gap-2">
+                                                <input className="w-full rounded-md border px-3 py-2" value={draft?.admissionTitleAr || ""} onChange={(e) => updateDraft({ admissionTitleAr: e.target.value })} dir="rtl" />
+                                                <input className="w-full rounded-md border px-3 py-2" value={draft?.admissionTitleEn || ""} onChange={(e) => updateDraft({ admissionTitleEn: e.target.value })} dir="ltr" />
+                                                <textarea className="w-full min-h-[120px] rounded-md border px-3 py-2" value={draft?.admissionTextAr || ""} onChange={(e) => updateDraft({ admissionTextAr: e.target.value })} dir="rtl" />
+                                                <textarea className="w-full min-h-[120px] rounded-md border px-3 py-2" value={draft?.admissionTextEn || ""} onChange={(e) => updateDraft({ admissionTextEn: e.target.value })} dir="ltr" />
+                                                <div className="flex justify-end gap-2 pt-2">
+                                                    <button onClick={cancelEdit} className="inline-flex items-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700"><X className="size-4" />{isAr ? "إلغاء" : "Cancel"}</button>
+                                                    <button onClick={saveEdit} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#c2a772] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}{isAr ? "حفظ" : "Save"}</button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                             {/* Vision, Mission, Goals */}
                             <div id="vision" className="mb-16">
                                 <div className="bg-white rounded-lg shadow-xl p-10 border-2 border-purple-200">
-                                    <div className="flex items-center gap-4 mb-6">
+                                    <div className="flex items-center justify-between gap-4 mb-6">
+                                        <div className="flex items-center gap-4">
                                         <div className="bg-purple-600 text-white p-4 rounded-full">
                                             <Target className="size-8" />
                                         </div>
-                                        <h2 className="text-3xl font-bold text-[#254151]">الرؤية والرسالة والأهداف</h2>
+                                        <h2 className="text-3xl font-bold text-[#254151]">{isAr ? view.visionSectionTitleAr : view.visionSectionTitleEn}</h2>
+                                        </div>
+                                        {isAdmin && editingSection !== "vision" && (
+                                            <button onClick={() => startEdit("vision")} className="inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white">
+                                                <Pencil className="size-4" />{isAr ? "تعديل القسم" : "Edit Section"}
+                                            </button>
+                                        )}
                                     </div>
 
                                     {/* Vision */}
@@ -49,11 +239,16 @@ export default function FoundationProgramPage() {
                                                 <div className="bg-blue-600 text-white size-12 rounded-full flex items-center justify-center">
                                                     <Lightbulb className="size-7" />
                                                 </div>
-                                                <h3 className="text-2xl font-bold text-[#254151]">الرؤية</h3>
+                                                <h3 className="text-2xl font-bold text-[#254151]">{isAr ? view.visionTitleAr : view.visionTitleEn}</h3>
                                             </div>
-                                            <p className="text-gray-700 text-lg leading-relaxed">
-                                                وتتمثل رؤية كلية البريمي الجامعية في مواصلة طريق التميز في تطوير مركز متكامل قابل للتطبيق والعمل وملائم يلبي احتياجات جميع طلاب الكلية من ذوي القدرات التعليمية المتنوعة والكفاءات اللغوية المختلفة، مما يساعد الكلية الجامعية في البريمي على تحقيق رسالتها في تعزيز قضية التعليم في خدمة المجتمع والمساهمة في أنشطة بناء الوطن.
-                                            </p>
+                                            {editingSection !== "vision" ? <p className="text-gray-700 text-lg leading-relaxed">{isAr ? view.visionTextAr : view.visionTextEn}</p> : (
+                                                <div className="grid gap-2">
+                                                    <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.visionTitleAr || ""} onChange={(e) => updateDraft({ visionTitleAr: e.target.value })} dir="rtl" />
+                                                    <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.visionTitleEn || ""} onChange={(e) => updateDraft({ visionTitleEn: e.target.value })} dir="ltr" />
+                                                    <textarea className="w-full min-h-[120px] rounded-md border px-3 py-2" value={draft?.visionTextAr || ""} onChange={(e) => updateDraft({ visionTextAr: e.target.value })} dir="rtl" />
+                                                    <textarea className="w-full min-h-[120px] rounded-md border px-3 py-2" value={draft?.visionTextEn || ""} onChange={(e) => updateDraft({ visionTextEn: e.target.value })} dir="ltr" />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -64,11 +259,20 @@ export default function FoundationProgramPage() {
                                                 <div className="bg-green-600 text-white size-12 rounded-full flex items-center justify-center">
                                                     <Target className="size-7" />
                                                 </div>
-                                                <h3 className="text-2xl font-bold text-[#254151]">مهمة البرنامج التأسيسي العام</h3>
+                                                <h3 className="text-2xl font-bold text-[#254151]">{isAr ? view.missionTitleAr : view.missionTitleEn}</h3>
                                             </div>
-                                            <p className="text-gray-700 text-lg leading-relaxed">
-                                                تزويد طلابنا الخريجين الطموحين بإتقان اللغة الإنجليزية ومهارات تكنولوجيا المعلومات الأساسية ومهارات الرياضيات لمتابعة دراساتهم الجامعية وبالتالي المساهمة في رفاهية المجتمع من خلال مساعٍ مختلفة.
-                                            </p>
+                                            {editingSection !== "vision" ? <p className="text-gray-700 text-lg leading-relaxed">{isAr ? view.missionTextAr : view.missionTextEn}</p> : (
+                                                <div className="grid gap-2">
+                                                    <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.missionTitleAr || ""} onChange={(e) => updateDraft({ missionTitleAr: e.target.value })} dir="rtl" />
+                                                    <textarea className="w-full min-h-[90px] rounded-md border px-3 py-2" value={draft?.missionTitleEn || ""} onChange={(e) => updateDraft({ missionTitleEn: e.target.value })} dir="ltr" />
+                                                    <textarea className="w-full min-h-[120px] rounded-md border px-3 py-2" value={draft?.missionTextAr || ""} onChange={(e) => updateDraft({ missionTextAr: e.target.value })} dir="rtl" />
+                                                    <textarea className="w-full min-h-[120px] rounded-md border px-3 py-2" value={draft?.missionTextEn || ""} onChange={(e) => updateDraft({ missionTextEn: e.target.value })} dir="ltr" />
+                                                    <div className="flex justify-end gap-2 pt-2">
+                                                        <button onClick={cancelEdit} className="inline-flex items-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700"><X className="size-4" />{isAr ? "إلغاء" : "Cancel"}</button>
+                                                        <button onClick={saveEdit} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#c2a772] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}{isAr ? "حفظ" : "Save"}</button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -77,7 +281,27 @@ export default function FoundationProgramPage() {
                             </div>
 
                             {/* Study Plan */}
-                            <FoundStudy />
+                            <FoundStudy
+                                isAr={isAr}
+                                isAdmin={isAdmin}
+                                isEditing={editingSection === "study"}
+                                saving={saving}
+                                titleAr={view.studyTitleAr}
+                                titleEn={view.studyTitleEn}
+                                noteAr={view.studyNoteAr}
+                                noteEn={view.studyNoteEn}
+                                onStartEdit={() => startEdit("study")}
+                                onCancelEdit={cancelEdit}
+                                onSaveEdit={saveEdit}
+                                onChangeTitleAr={(value) => updateDraft({ studyTitleAr: value })}
+                                onChangeTitleEn={(value) => updateDraft({ studyTitleEn: value })}
+                                onChangeNoteAr={(value) => updateDraft({ studyNoteAr: value })}
+                                onChangeNoteEn={(value) => updateDraft({ studyNoteEn: value })}
+                                level1Courses={view.level1Courses || []}
+                                level2Courses={view.level2Courses || []}
+                                onChangeLevel1Courses={(courses) => updateDraft({ level1Courses: courses })}
+                                onChangeLevel2Courses={(courses) => updateDraft({ level2Courses: courses })}
+                            />
                             {/* Completion Exam */}
                             <div id="completion" className="mb-16">
                                 <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg shadow-xl p-10 border-2 border-red-200">

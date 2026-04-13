@@ -1,8 +1,9 @@
 "use client"
 
 import { motion, type Variants } from "framer-motion"
-import { Calendar, ExternalLink, UserCheck } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { Calendar, ExternalLink, Pencil, UserCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import LoadingCard from "@/components/global/LoadingCard";
 import { fetchPartnerships } from "@/store/contentSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -20,6 +21,7 @@ type PartnersType = {
 }
 export default function PartnershipsContent() {
     const dispatch = useAppDispatch();
+    const [isAdmin, setIsAdmin] = useState(false);
     const partners = useAppSelector((state) => state.content.partnerships.items as PartnersType[]);
     const loading = useAppSelector((state) => state.content.partnerships.loading);
     const error = useAppSelector((state) => state.content.partnerships.error);
@@ -60,10 +62,23 @@ export default function PartnershipsContent() {
         }
     }, [dispatch, loading, partners.length]);
 
+    useEffect(() => {
+        void (async () => {
+            try {
+                const res = await fetch("/api/auth/me", { method: "GET", credentials: "include", cache: "no-store" });
+                const json = (await res.json()) as { ok?: boolean; isAdmin?: boolean };
+                setIsAdmin(Boolean(json?.ok && json?.isAdmin));
+            } catch {
+                setIsAdmin(false);
+            }
+        })();
+    }, []);
+
     return (
         <div className="space-y-10">
             {/* Header */}
-            <div className="flex items-center gap-4 pb-6 border-b-2 border-gray-200">
+            <div className="flex items-center justify-between gap-4 pb-6 border-b-2 border-gray-200">
+                <div className="flex items-center gap-4">
                 <div className="p-3 bg-gradient-to-br from-[#254151] to-[#2d4a5c] rounded-xl">
                     <UserCheck className="size-8 text-white" />
                 </div>
@@ -73,6 +88,16 @@ export default function PartnershipsContent() {
                     </h2>
                     <p className="text-gray-600 mt-1">Our Strategic Partners</p>
                 </div>
+                </div>
+                {isAdmin && (
+                    <Link
+                        href="/dashboard/partners"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#254151] px-4 py-2 text-sm font-semibold text-white hover:opacity-95"
+                    >
+                        <Pencil className="size-4" />
+                        تعديل الشركاء
+                    </Link>
+                )}
             </div>
 
             {/* Introduction */}

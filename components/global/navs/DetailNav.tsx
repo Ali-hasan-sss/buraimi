@@ -109,7 +109,7 @@ export default function DetailNav() {
                             { title: "الشركاء", href: "/main/about#partners" },
                             { title: "الوظائف", href: "/main/careers" },
                             { title: "الصحة والسلامة", href: "/main/about#health-safety" },
-                            { title: "BUC Campus Map", href: "/main/about#campus-map" },
+                            { title: "خارطة الجامعة", href: "/main/about#campus-map" },
                         ],
                     },
                     {
